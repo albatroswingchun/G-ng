@@ -19,7 +19,6 @@
   <style>
     :root {
       --bg: #050505;
-      --bg-2: #0b0b0b;
       --panel: #121212;
       --panel-2: #171717;
       --line: #242424;
@@ -28,6 +27,7 @@
       --muted: #a0a0a0;
       --muted-2: #757575;
       --green: #1faa59;
+      --yellow-soft: #fff3b0;
       --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
       --radius-xl: 22px;
       --radius-lg: 16px;
@@ -39,16 +39,17 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
       background:
         radial-gradient(circle at top, rgba(255,255,255,.04), transparent 30%),
         linear-gradient(180deg, #080808 0%, #040404 100%);
       color: var(--text);
       font-family: Inter, Arial, sans-serif;
-      min-height: 100%;
     }
 
     body {
@@ -56,21 +57,15 @@
     }
 
     .app-shell {
-      min-height: 100vh;
       width: 100%;
+      min-height: 100vh;
     }
 
     .radar-top {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background:
-        linear-gradient(180deg, rgba(8,8,8,.98), rgba(8,8,8,.92)),
-        #080808;
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--line);
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
-      padding: 12px 14px 10px;
+      position: relative;
+      z-index: 1;
+      background: transparent;
+      padding: 16px 14px 0;
     }
 
     .radar-top-inner {
@@ -80,10 +75,10 @@
 
     .top-title-row {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .brand-block {
@@ -95,13 +90,10 @@
       text-transform: uppercase;
       letter-spacing: 0.14em;
       font-size: 11px;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
-    h1,
-    h2,
-    h3,
-    p {
+    h1, h2, h3, p {
       margin: 0;
     }
 
@@ -109,13 +101,6 @@
       font-size: clamp(1.3rem, 2.8vw, 2rem);
       letter-spacing: -0.03em;
       line-height: 1.05;
-    }
-
-    .top-sub {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      line-height: 1.35;
     }
 
     .save-pill {
@@ -127,26 +112,28 @@
       font-size: 0.84rem;
       font-weight: 700;
       white-space: nowrap;
+      min-width: 170px;
+      text-align: center;
     }
 
     .radar-card {
       background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01));
       border: 1px solid rgba(255,255,255,.05);
       border-radius: var(--radius-xl);
-      padding: 10px;
+      padding: 12px;
       overflow: hidden;
+      box-shadow: var(--shadow);
     }
 
     .radar-canvas-wrap {
       width: 100%;
-      aspect-ratio: 1 / 1;
-      max-height: min(52vh, 520px);
+      max-width: 320px;
+      height: 320px;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      background:
-        radial-gradient(circle at center, rgba(255,255,255,.035), transparent 55%);
+      background: radial-gradient(circle at center, rgba(255,255,255,.03), transparent 60%);
       border-radius: 18px;
     }
 
@@ -161,7 +148,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .summary-box {
@@ -181,7 +168,7 @@
     }
 
     .summary-value {
-      color: #fff3b0;
+      color: var(--yellow-soft);
       font-weight: 800;
       font-size: 1rem;
       line-height: 1.2;
@@ -192,6 +179,8 @@
       max-width: 920px;
       margin: 0 auto;
       padding: 16px 14px 28px;
+      position: relative;
+      z-index: 1;
     }
 
     .section {
@@ -302,6 +291,7 @@
       border: 1px solid rgba(255,255,255,.06);
       background: linear-gradient(180deg, #252525, #161616);
       color: #fff;
+      flex-shrink: 0;
     }
 
     .slider-row {
@@ -381,9 +371,10 @@
       border-radius: 14px;
       background: linear-gradient(180deg, #1a1a1a, #121212);
       color: #ececec;
-      padding: 14px 14px;
+      padding: 14px;
       min-height: 58px;
       cursor: pointer;
+      font: inherit;
     }
 
     .form-toggle.active {
@@ -480,30 +471,24 @@
     }
 
     @media (max-width: 760px) {
+      .top-title-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .save-pill {
+        width: 100%;
+      }
+
       .summary-row,
       .meta-grid,
       .qualities-grid {
         grid-template-columns: 1fr;
       }
 
-      .top-title-row {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .save-pill {
-        width: 100%;
-        text-align: center;
-      }
-
-      .radar-top {
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-
-      .page {
-        padding-left: 10px;
-        padding-right: 10px;
+      .radar-canvas-wrap {
+        max-width: 300px;
+        height: 300px;
       }
     }
   </style>
@@ -517,9 +502,6 @@
           <div class="brand-block">
             <div class="eyebrow">Profil martial</div>
             <h1>Gōng</h1>
-            <p class="top-sub">
-              Radar principal, mise à jour en direct, nuances du gris au jaune.
-            </p>
           </div>
           <div id="saveStatus" class="save-pill">Sauvegarde automatique active</div>
         </div>
@@ -552,9 +534,7 @@
       <section class="section">
         <div class="section-header">
           <div class="section-title">Informations</div>
-          <div class="section-sub">
-            Ces données sont enregistrées automatiquement sur l’appareil.
-          </div>
+          <div class="section-sub">Ces données sont enregistrées automatiquement sur l’appareil.</div>
         </div>
         <div class="section-body">
           <div class="meta-grid">
@@ -567,9 +547,7 @@
       <section class="section">
         <div class="section-header">
           <div class="section-title">Évaluation des qualités</div>
-          <div class="section-sub">
-            Chaque valeur démarre à 0. Plus la note monte, plus la couleur tire vers le jaune.
-          </div>
+          <div class="section-sub">Chaque valeur démarre à 0. Plus la note monte, plus la couleur tire vers le jaune.</div>
         </div>
         <div class="section-body">
           <div id="controlsList" class="controls-list"></div>
@@ -579,9 +557,7 @@
       <section class="section">
         <div class="section-header">
           <div class="section-title">Formes</div>
-          <div class="section-sub">
-            Validation simple : gris = non validé, vert = validé.
-          </div>
+          <div class="section-sub">Validation simple : gris = non validé, vert = validé.</div>
         </div>
         <div class="section-body">
           <div id="formsGrid" class="forms-grid"></div>
@@ -591,9 +567,7 @@
       <section class="section">
         <div class="section-header">
           <div class="section-title">Résumé des valeurs</div>
-          <div class="section-sub">
-            Vue rapide de toutes les qualités notées.
-          </div>
+          <div class="section-sub">Vue rapide de toutes les qualités notées.</div>
         </div>
         <div class="section-body">
           <div id="qualitiesGrid" class="qualities-grid"></div>
@@ -603,9 +577,7 @@
       <section class="section">
         <div class="section-header">
           <div class="section-title">Observation</div>
-          <div class="section-sub">
-            Notes libres, remarques techniques, axes de progression.
-          </div>
+          <div class="section-sub">Notes libres, remarques techniques, axes de progression.</div>
         </div>
         <div class="section-body">
           <textarea
@@ -627,8 +599,7 @@
             <button id="resetBtn" class="btn btn-primary">Réinitialiser</button>
           </div>
           <div class="footer-note">
-            Pour l’installation PWA, il faut ouvrir cette app depuis un site servi en HTTPS
-            ou via un hébergement type GitHub Pages, Netlify ou Vercel.
+            Pour l’installation PWA, ouvre cette app depuis un site en HTTPS ou via GitHub Pages, Netlify ou Vercel.
           </div>
         </div>
       </section>
@@ -685,7 +656,7 @@
       { key: "baton", label: "Bâton long" }
     ];
 
-    const storageKey = "gong-martial-app-v1";
+    const storageKey = "gong-martial-app-v2";
 
     const defaultState = {
       studentName: "",
@@ -880,10 +851,7 @@
         return `
           <div class="quality-chip">
             <span class="quality-chip-name">${quality.label}</span>
-            <span
-              class="quality-chip-value"
-              style="color:${getYellowShade(value)}"
-            >${value}/10</span>
+            <span class="quality-chip-value" style="color:${getYellowShade(value)}">${value}/10</span>
           </div>
         `;
       }).join("");
@@ -908,12 +876,41 @@
     function resizeCanvasForDisplay() {
       const ratio = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-      const size = Math.max(240, Math.floor(Math.min(rect.width, rect.height || rect.width)));
+      const size = Math.max(260, Math.floor(Math.min(rect.width, rect.height || rect.width)));
       canvas.width = Math.floor(size * ratio);
       canvas.height = Math.floor(size * ratio);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(ratio, ratio);
       return size;
+    }
+
+    function drawWrappedLabel(ctx, text, x, y, align, fontSize) {
+      const words = text.split(" ");
+      const maxWidth = 82;
+      const lineHeight = fontSize + 2;
+      const lines = [];
+      let currentLine = "";
+
+      for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const testWidth = ctx.measureText(testLine).width;
+
+        if (testWidth > maxWidth && currentLine) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+
+      if (currentLine) lines.push(currentLine);
+
+      const totalHeight = (lines.length - 1) * lineHeight;
+      const startY = y - totalHeight / 2;
+
+      lines.forEach((line, i) => {
+        ctx.fillText(line, x, startY + i * lineHeight);
+      });
     }
 
     function drawRadar() {
@@ -922,7 +919,10 @@
       const height = size;
       const centerX = width / 2;
       const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.31;
+
+      const outerPadding = 62;
+      const radius = Math.min(width, height) / 2 - outerPadding;
+
       const levels = 10;
       const angleStep = (Math.PI * 2) / martialQualities.length;
 
@@ -971,8 +971,7 @@
           label: quality.label,
           value,
           x: centerX + Math.cos(angle) * pointRadius,
-          y: centerY + Math.sin(angle) * pointRadius,
-          angle
+          y: centerY + Math.sin(angle) * pointRadius
         };
       });
 
@@ -1008,20 +1007,23 @@
         ctx.fill();
       });
 
+      const fontSize = Math.max(10, Math.min(13, width * 0.04));
+      ctx.font = `${fontSize}px Inter, Arial, sans-serif`;
+      ctx.fillStyle = "rgba(240,240,240,.92)";
+      ctx.textBaseline = "middle";
+
       martialQualities.forEach((quality, index) => {
         const angle = -Math.PI / 2 + index * angleStep;
-        const labelRadius = radius + 28;
+        const labelRadius = radius + 30;
         const lx = centerX + Math.cos(angle) * labelRadius;
         const ly = centerY + Math.sin(angle) * labelRadius;
 
-        ctx.fillStyle = "rgba(240,240,240,.92)";
-        ctx.font = `${Math.max(11, Math.min(14, width * 0.024))}px Inter, Arial, sans-serif`;
-        ctx.textAlign =
-          lx < centerX - 10 ? "right" :
-          lx > centerX + 10 ? "left" :
-          "center";
-        ctx.textBaseline = ly < centerY ? "bottom" : "top";
-        ctx.fillText(quality.label, lx, ly);
+        let align = "center";
+        if (lx < centerX - 20) align = "right";
+        else if (lx > centerX + 20) align = "left";
+
+        ctx.textAlign = align;
+        drawWrappedLabel(ctx, quality.label, lx, ly, align, fontSize);
       });
 
       ctx.beginPath();
