@@ -1,11 +1,11 @@
 {
-  "name": "Gōng - Évaluation Martiale",
-  "short_name": "Martial Eval",
-  "description": "Application d'évaluation martiale avec diagramme radar et sauvegarde automatique.",
+  "name": "Gōng",
+  "short_name": "Gōng",
+  "description": "Application d'évaluation martiale avec radar interactif.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050505",
-  "theme_color": "#0a0a0a",
+  "theme_color": "#050505",
   "orientation": "portrait",
   "icons": [
     {
