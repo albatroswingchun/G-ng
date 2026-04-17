@@ -2,10 +2,16 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0a0a0a" />
-  <meta name="description" content="Application d'évaluation martiale avec diagramme radar, sauvegarde automatique et installation PWA." />
-  <title>Gōng - Évaluation Martiale</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+  <meta name="theme-color" content="#050505" />
+  <meta
+    name="description"
+    content="Application d'évaluation martiale avec radar interactif, sauvegarde automatique et installation PWA."
+  />
+  <title>Shì</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -13,18 +19,19 @@
   <style>
     :root {
       --bg: #050505;
-      --panel: #111111;
+      --bg-2: #0b0b0b;
+      --panel: #121212;
       --panel-2: #171717;
-      --panel-3: #1d1d1d;
-      --line: #2d2d2d;
-      --soft-line: #232323;
+      --line: #242424;
+      --line-soft: #1b1b1b;
       --text: #f2f2f2;
-      --muted: #b8b8b8;
-      --muted-2: #8a8a8a;
-      --shadow: 0 18px 50px rgba(0,0,0,.42);
-      --radius-xl: 24px;
-      --radius-lg: 18px;
-      --radius-md: 14px;
+      --muted: #a0a0a0;
+      --muted-2: #757575;
+      --green: #1faa59;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
     }
 
     * {
@@ -32,85 +39,235 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.05), transparent 30%),
-        linear-gradient(180deg, #0a0a0a 0%, #040404 100%);
+        radial-gradient(circle at top, rgba(255,255,255,.04), transparent 30%),
+        linear-gradient(180deg, #080808 0%, #040404 100%);
       color: var(--text);
       font-family: Inter, Arial, sans-serif;
       min-height: 100%;
     }
 
     body {
-      padding: 16px;
+      padding: 0;
     }
 
-    .app {
-      width: min(1200px, 100%);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 18px;
+    .app-shell {
+      min-height: 100vh;
+      width: 100%;
     }
 
-    .panel {
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .radar-top {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background:
+        linear-gradient(180deg, rgba(8,8,8,.98), rgba(8,8,8,.92)),
+        #080808;
       backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      padding: 12px 14px 10px;
     }
 
-    .panel-header {
-      padding: 22px 22px 16px;
-      border-bottom: 1px solid var(--soft-line);
-      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    .radar-top-inner {
+      max-width: 920px;
+      margin: 0 auto;
     }
 
-    .eyebrow {
-      font-size: 12px;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--muted-2);
+    .top-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 8px;
     }
 
-    h1, h2, h3, p {
+    .brand-block {
+      min-width: 0;
+    }
+
+    .eyebrow {
+      color: var(--muted-2);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
       margin: 0;
     }
 
     h1 {
-      font-size: clamp(1.7rem, 2.6vw, 2.4rem);
-      line-height: 1.08;
-      letter-spacing: -.03em;
+      font-size: clamp(1.3rem, 2.8vw, 2rem);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
     }
 
-    .sub {
+    .top-sub {
+      margin-top: 4px;
       color: var(--muted);
-      margin-top: 10px;
-      line-height: 1.5;
-      font-size: .98rem;
+      font-size: 0.92rem;
+      line-height: 1.35;
     }
 
-    .controls-wrap {
-      padding: 18px;
+    .save-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, #1f1f1f, #131313);
+      color: #e7e7e7;
+      font-size: 0.84rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .radar-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: var(--radius-xl);
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .radar-canvas-wrap {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-height: min(52vh, 520px);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,.035), transparent 55%);
+      border-radius: 18px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    .summary-row {
       display: grid;
-      gap: 14px;
-      max-height: calc(100vh - 180px);
-      overflow: auto;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .summary-box {
+      background: linear-gradient(180deg, #151515, #101010);
+      border: 1px solid rgba(255,255,255,.045);
+      border-radius: 14px;
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .summary-label {
+      color: var(--muted-2);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.72rem;
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      color: #fff3b0;
+      font-weight: 800;
+      font-size: 1rem;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 16px 14px 28px;
+    }
+
+    .section {
+      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.012));
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .section-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line-soft);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .section-sub {
+      margin-top: 6px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .section-body {
+      padding: 14px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.06);
+      background: #0d0d0d;
+      color: #f2f2f2;
+      border-radius: 14px;
+      padding: 14px 15px;
+      font: inherit;
+      outline: none;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: #777;
+    }
+
+    .textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .controls-list {
+      display: grid;
+      gap: 12px;
     }
 
     .control-card {
       background: linear-gradient(180deg, var(--panel), var(--panel-2));
       border: 1px solid rgba(255,255,255,.05);
       border-radius: var(--radius-lg);
-      padding: 16px;
+      padding: 14px;
     }
 
-    .control-top {
+    .control-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -118,49 +275,46 @@
       margin-bottom: 12px;
     }
 
-    .label-block {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .control-text {
       min-width: 0;
     }
 
-    .label {
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: -.01em;
+    .control-title {
+      font-size: 0.98rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
     }
 
-    .desc {
+    .control-desc {
+      margin-top: 4px;
       color: var(--muted-2);
-      font-size: .86rem;
+      font-size: 0.84rem;
       line-height: 1.35;
     }
 
-    .value-pill {
-      min-width: 58px;
-      text-align: center;
+    .value-badge {
+      min-width: 64px;
       padding: 10px 12px;
+      text-align: center;
       border-radius: 999px;
-      background: linear-gradient(180deg, #252525, #171717);
-      border: 1px solid rgba(255,255,255,.06);
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 0.95rem;
+      border: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, #252525, #161616);
       color: #fff;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
     }
 
     .slider-row {
       display: grid;
-      grid-template-columns: 34px 1fr 34px;
-      align-items: center;
+      grid-template-columns: 28px 1fr 28px;
       gap: 10px;
+      align-items: center;
     }
 
-    .scale-value {
+    .slider-edge {
       text-align: center;
+      font-size: 0.78rem;
       color: var(--muted-2);
-      font-size: .82rem;
       font-weight: 700;
     }
 
@@ -178,16 +332,16 @@
     }
 
     input[type="range"]::-webkit-slider-runnable-track {
-      height: 8px;
+      height: 10px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #686868, #bdbdbd);
+      background: linear-gradient(90deg, #3a3a3a, #fff2a6);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
     }
 
     input[type="range"]::-moz-range-track {
-      height: 8px;
+      height: 10px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #686868, #bdbdbd);
+      background: linear-gradient(90deg, #3a3a3a, #fff2a6);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
     }
 
@@ -197,195 +351,102 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      border: 2px solid #ededed;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #9f9f9f 70%, #575757 100%);
-      margin-top: -10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.4);
+      margin-top: -9px;
+      border: 2px solid #f4e58f;
+      background: radial-gradient(circle at 30% 30%, #fffdf0, #f5db52 72%, #b08a00 100%);
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
     }
 
     input[type="range"]::-moz-range-thumb {
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      border: 2px solid #ededed;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #9f9f9f 70%, #575757 100%);
-      box-shadow: 0 6px 18px rgba(0,0,0,.4);
+      border: 2px solid #f4e58f;
+      background: radial-gradient(circle at 30% 30%, #fffdf0, #f5db52 72%, #b08a00 100%);
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
     }
 
-    .right-panel {
+    .forms-grid {
       display: grid;
-      grid-template-rows: auto 1fr auto auto;
-    }
-
-    .visual-wrap {
-      padding: 18px;
-      display: grid;
-      gap: 18px;
-    }
-
-    .score-card,
-    .notes-card,
-    .canvas-card,
-    .session-card {
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
-      border: 1px solid rgba(255,255,255,.05);
-      border-radius: var(--radius-lg);
-      padding: 18px;
-    }
-
-    .score-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .score-item {
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      border: 1px solid rgba(255,255,255,.04);
-      border-radius: 16px;
-      padding: 14px;
-    }
-
-    .score-item .mini {
-      color: var(--muted-2);
-      font-size: .76rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      margin-bottom: 6px;
-    }
-
-    .score-item strong {
-      font-size: 1.35rem;
-      letter-spacing: -.03em;
-      line-height: 1.2;
-      display: block;
-    }
-
-    .canvas-box {
-      aspect-ratio: 1 / 1;
-      width: 100%;
-      background: radial-gradient(circle at center, rgba(255,255,255,.04), rgba(255,255,255,.015) 35%, transparent 65%);
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
-      overflow: hidden;
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-      display: block;
-    }
-
-    .section-title {
-      font-size: 1rem;
-      font-weight: 800;
-      margin-bottom: 14px;
-      letter-spacing: -.02em;
-    }
-
-    .qualities-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
     }
 
-    .quality-row {
+    .form-toggle {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
-      padding: 12px 14px;
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #1a1a1a, #121212);
+      color: #ececec;
+      padding: 14px 14px;
+      min-height: 58px;
+    }
+
+    .form-toggle.active {
+      background: linear-gradient(180deg, #21b85f, #158747);
+      border-color: rgba(255,255,255,.08);
+      color: #fff;
+    }
+
+    .form-name {
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .form-state {
+      font-size: 0.85rem;
+      opacity: 0.92;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .qualities-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .quality-chip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
       border-radius: 14px;
       background: rgba(255,255,255,.02);
       border: 1px solid rgba(255,255,255,.04);
+      padding: 12px 14px;
     }
 
-    .quality-row span:first-child {
-      color: #e9e9e9;
-      font-size: .93rem;
+    .quality-chip-name {
+      color: #ececec;
+      font-size: 0.92rem;
     }
 
-    .quality-row span:last-child {
-      color: #fff;
+    .quality-chip-value {
       font-weight: 800;
-    }
-
-    .notes-card textarea,
-    .session-card input,
-    .session-card select {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 16px;
-      background: #0c0c0c;
-      color: #f0f0f0;
-      padding: 14px 16px;
-      font: inherit;
-      line-height: 1.5;
-    }
-
-    .notes-card textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-
-    .notes-card textarea::placeholder,
-    .session-card input::placeholder {
-      color: #767676;
-    }
-
-    .session-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-      color: var(--muted-2);
-      font-size: .9rem;
-    }
-
-    .install-btn {
-      border: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, #2a2a2a, #181818);
       color: #fff;
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-weight: 700;
-      display: none;
     }
 
     .actions {
-      padding: 18px;
-      border-top: 1px solid var(--soft-line);
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-    }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      font: inherit;
+      margin-top: 2px;
     }
 
     .btn {
-      flex: 1 1 180px;
-      min-height: 54px;
-      padding: 14px 18px;
-      border-radius: 16px;
+      border: 0;
+      border-radius: 14px;
+      min-height: 52px;
+      padding: 14px 16px;
+      font: inherit;
       font-weight: 800;
-      letter-spacing: -.01em;
-      transition: transform .18s ease;
+      cursor: pointer;
+      transition: transform .16s ease;
+      flex: 1 1 180px;
     }
 
     .btn:active {
@@ -393,179 +454,248 @@
     }
 
     .btn-primary {
-      background: linear-gradient(180deg, #f0f0f0, #9a9a9a);
-      color: #060606;
-      box-shadow: 0 10px 24px rgba(255,255,255,.08);
+      background: linear-gradient(180deg, #fff1a8, #d3ad12);
+      color: #0a0a0a;
     }
 
     .btn-secondary {
-      background: linear-gradient(180deg, #222, #151515);
+      background: linear-gradient(180deg, #242424, #171717);
       color: #ededed;
       border: 1px solid rgba(255,255,255,.06);
     }
 
+    .btn-install {
+      background: linear-gradient(180deg, #2a2a2a, #191919);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.06);
+      display: none;
+    }
+
     .footer-note {
       color: var(--muted-2);
-      font-size: .84rem;
-      line-height: 1.45;
-      padding: 0 18px 18px;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      margin-top: 4px;
     }
 
-    @media (max-width: 980px) {
-      .app {
+    @media (max-width: 760px) {
+      .summary-row,
+      .meta-grid,
+      .qualities-grid {
         grid-template-columns: 1fr;
       }
 
-      .controls-wrap {
-        max-height: none;
+      .top-title-row {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      .score-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      body {
-        padding: 10px;
+      .save-pill {
+        width: 100%;
+        text-align: center;
       }
 
-      .panel-header,
-      .controls-wrap,
-      .visual-wrap,
-      .actions {
-        padding-left: 14px;
-        padding-right: 14px;
+      .radar-top {
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
-      .qualities-list,
-      .session-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .score-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .control-card,
-      .score-card,
-      .notes-card,
-      .canvas-card,
-      .session-card {
-        padding: 14px;
-      }
-
-      .value-pill {
-        min-width: 52px;
+      .page {
+        padding-left: 10px;
+        padding-right: 10px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <section class="panel left-panel">
-      <div class="panel-header">
-        <div class="eyebrow">Tableau d'évaluation</div>
-        <h1>Profil martial interactif</h1>
-        <p class="sub">
-          Ajuste chaque qualité avec un curseur tactile de 0 à 10. Le diagramme radar se met à jour en direct.
-        </p>
-      </div>
+  <div class="app-shell">
 
-      <div id="controls" class="controls-wrap"></div>
-    </section>
-
-    <section class="panel right-panel">
-      <div class="panel-header">
-        <div class="eyebrow">Synthèse visuelle</div>
-        <h2>Vue d'ensemble</h2>
-        <p class="sub">Sauvegarde automatique locale et installation en application possible.</p>
-      </div>
-
-      <div class="visual-wrap">
-        <div class="session-card">
-          <div class="section-title">Informations de séance</div>
-          <div class="session-grid">
-            <input id="studentName" type="text" placeholder="Nom de l'élève" />
-            <input id="sessionDate" type="date" />
+    <header class="radar-top">
+      <div class="radar-top-inner">
+        <div class="top-title-row">
+          <div class="brand-block">
+            <div class="eyebrow">Profil martial</div>
+            <h1>Shì</h1>
+            <p class="top-sub">
+              Radar principal, mise à jour en direct, nuances du gris au jaune.
+            </p>
           </div>
-          <div class="status-row">
-            <span id="saveStatus">Sauvegarde automatique active</span>
-            <button id="installBtn" class="install-btn">Installer l'application</button>
-          </div>
+          <div id="saveStatus" class="save-pill">Sauvegarde automatique active</div>
         </div>
 
-        <div class="score-card">
-          <div class="section-title">Résumé</div>
-          <div class="score-grid">
-            <div class="score-item">
-              <div class="mini">Note globale</div>
-              <strong id="averageValue">0.0 / 10</strong>
-            </div>
-            <div class="score-item">
-              <div class="mini">Qualité la plus forte</div>
-              <strong id="bestValue">—</strong>
-            </div>
-            <div class="score-item">
-              <div class="mini">Axe prioritaire</div>
-              <strong id="lowestValue">—</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="canvas-card">
-          <div class="section-title">Diagramme radar</div>
-          <div class="canvas-box">
+        <div class="radar-card">
+          <div class="radar-canvas-wrap">
             <canvas id="radarCanvas" width="700" height="700"></canvas>
           </div>
-        </div>
 
-        <div class="score-card">
-          <div class="section-title">Détail des qualités</div>
-          <div id="qualitiesList" class="qualities-list"></div>
-        </div>
-
-        <div class="notes-card">
-          <div class="section-title">Observation / commentaire</div>
-          <textarea id="coachNote" placeholder="Exemple : bonne structure générale, mais relâchement encore irrégulier sur les enchaînements rapides."></textarea>
+          <div class="summary-row">
+            <div class="summary-box">
+              <div class="summary-label">Moyenne</div>
+              <div class="summary-value" id="averageValue">0.0 / 10</div>
+            </div>
+            <div class="summary-box">
+              <div class="summary-label">Point fort</div>
+              <div class="summary-value" id="bestValue">—</div>
+            </div>
+            <div class="summary-box">
+              <div class="summary-label">À travailler</div>
+              <div class="summary-value" id="lowestValue">—</div>
+            </div>
+          </div>
         </div>
       </div>
+    </header>
 
-      <div class="actions">
-        <button class="btn btn-primary" id="resetBtn">Réinitialiser</button>
-        <button class="btn btn-secondary" id="randomBtn">Exemple auto</button>
-      </div>
+    <main class="page">
 
-      <div class="footer-note">
-        Les données sont enregistrées automatiquement dans le navigateur de l'appareil.
-      </div>
-    </section>
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Informations</div>
+          <div class="section-sub">
+            Ces données sont enregistrées automatiquement sur l’appareil.
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="meta-grid">
+            <input id="studentName" class="input" type="text" placeholder="Nom de l'élève" />
+            <input id="sessionDate" class="input" type="date" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Évaluation des qualités</div>
+          <div class="section-sub">
+            Chaque valeur démarre à 0. Plus la note monte, plus la couleur tire vers le jaune.
+          </div>
+        </div>
+        <div class="section-body">
+          <div id="controlsList" class="controls-list"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Formes</div>
+          <div class="section-sub">
+            Validation simple : gris = non validé, vert = validé.
+          </div>
+        </div>
+        <div class="section-body">
+          <div id="formsGrid" class="forms-grid"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Résumé des valeurs</div>
+          <div class="section-sub">
+            Vue rapide de toutes les qualités notées.
+          </div>
+        </div>
+        <div class="section-body">
+          <div id="qualitiesGrid" class="qualities-grid"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Observation</div>
+          <div class="section-sub">
+            Notes libres, remarques techniques, axes de progression.
+          </div>
+        </div>
+        <div class="section-body">
+          <textarea
+            id="coachNote"
+            class="textarea"
+            placeholder="Exemple : bonne structure générale, mais relâchement et coordination encore irréguliers sous pression."
+          ></textarea>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-header">
+          <div class="section-title">Actions</div>
+        </div>
+        <div class="section-body">
+          <div class="actions">
+            <button id="installBtn" class="btn btn-install">Installer l’application</button>
+            <button id="randomBtn" class="btn btn-secondary">Exemple auto</button>
+            <button id="resetBtn" class="btn btn-primary">Réinitialiser</button>
+          </div>
+          <div class="footer-note">
+            Pour l’installation PWA, il faut ouvrir cette app depuis un site servi en HTTPS
+            ou via un hébergement type GitHub Pages, Netlify ou Vercel.
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
   <script>
     const martialQualities = [
-      { key: 'force', label: 'Force', description: 'Capacité à produire de la puissance physique.' },
-      { key: 'relachement', label: 'Relâchement', description: 'Absence de tension parasite et fluidité.' },
-      { key: 'precision', label: 'Précision', description: 'Justesse technique et placement.' },
-      { key: 'structure', label: 'Structure', description: 'Alignement, stabilité et organisation corporelle.' },
-      { key: 'rapidite', label: 'Rapidité', description: 'Vitesse d’exécution et temps de réaction.' },
-      { key: 'souplesse', label: 'Souplesse', description: 'Mobilité générale et amplitude utile.' },
-      { key: 'equilibre', label: 'Équilibre', description: 'Gestion des appuis et stabilité dynamique.' },
-      { key: 'coordination', label: 'Coordination', description: 'Capacité à synchroniser le corps efficacement.' },
-      { key: 'timing', label: 'Timing', description: 'Choix du bon moment pour agir.' },
-      { key: 'endurance', label: 'Endurance', description: 'Capacité à maintenir l’effort dans le temps.' },
-      { key: 'explosivite', label: 'Explosivité', description: 'Capacité à déclencher vite et fort.' },
-      { key: 'ancrage', label: 'Ancrage', description: 'Connexion au sol et enracinement.' }
+      {
+        key: "relachement",
+        label: "Relâchement",
+        description: "Capacité à supprimer les tensions inutiles."
+      },
+      {
+        key: "precision",
+        label: "Précision",
+        description: "Justesse des gestes, trajectoires et placements."
+      },
+      {
+        key: "structure",
+        label: "Structure",
+        description: "Organisation corporelle et alignement."
+      },
+      {
+        key: "ancrage",
+        label: "Ancrage",
+        description: "Connexion au sol et stabilité."
+      },
+      {
+        key: "vitesse",
+        label: "Vitesse",
+        description: "Rapidité d’exécution et de réaction."
+      },
+      {
+        key: "coordination",
+        label: "Coordination",
+        description: "Capacité à synchroniser le corps efficacement."
+      },
+      {
+        key: "endurance",
+        label: "Endurance",
+        description: "Capacité à maintenir l’effort dans la durée."
+      }
     ];
 
-    const storageKey = 'martial-evaluation-data-v2';
+    const martialForms = [
+      { key: "forme1", label: "Forme 1" },
+      { key: "forme2", label: "Forme 2" },
+      { key: "forme3", label: "Forme 3" },
+      { key: "forme4", label: "Forme 4" },
+      { key: "mannequin", label: "Mannequin" },
+      { key: "couteaux", label: "Couteaux papillon" },
+      { key: "baton", label: "Bâton long" }
+    ];
+
+    const storageKey = "shi-martial-app-v1";
 
     const defaultState = {
-      studentName: '',
-      sessionDate: '',
-      coachNote: '',
+      studentName: "",
+      sessionDate: "",
+      coachNote: "",
       values: martialQualities.reduce((acc, item) => {
-        acc[item.key] = 5;
+        acc[item.key] = 0;
+        return acc;
+      }, {}),
+      forms: martialForms.reduce((acc, item) => {
+        acc[item.key] = false;
         return acc;
       }, {})
     };
@@ -573,40 +703,44 @@
     let deferredPrompt = null;
     let saveTimer = null;
 
-    const savedState = loadState();
-    let state = {
-      studentName: savedState.studentName ?? defaultState.studentName,
-      sessionDate: savedState.sessionDate ?? defaultState.sessionDate,
-      coachNote: savedState.coachNote ?? defaultState.coachNote,
-      values: { ...defaultState.values, ...(savedState.values || {}) }
-    };
+    const saveStatus = document.getElementById("saveStatus");
+    const studentNameInput = document.getElementById("studentName");
+    const sessionDateInput = document.getElementById("sessionDate");
+    const coachNoteInput = document.getElementById("coachNote");
+    const controlsList = document.getElementById("controlsList");
+    const formsGrid = document.getElementById("formsGrid");
+    const qualitiesGrid = document.getElementById("qualitiesGrid");
+    const averageValue = document.getElementById("averageValue");
+    const bestValue = document.getElementById("bestValue");
+    const lowestValue = document.getElementById("lowestValue");
+    const installBtn = document.getElementById("installBtn");
+    const randomBtn = document.getElementById("randomBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const canvas = document.getElementById("radarCanvas");
+    const ctx = canvas.getContext("2d");
 
-    const controlsContainer = document.getElementById('controls');
-    const qualitiesList = document.getElementById('qualitiesList');
-    const averageValue = document.getElementById('averageValue');
-    const bestValue = document.getElementById('bestValue');
-    const lowestValue = document.getElementById('lowestValue');
-    const coachNote = document.getElementById('coachNote');
-    const studentName = document.getElementById('studentName');
-    const sessionDate = document.getElementById('sessionDate');
-    const saveStatus = document.getElementById('saveStatus');
-    const installBtn = document.getElementById('installBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const randomBtn = document.getElementById('randomBtn');
-    const canvas = document.getElementById('radarCanvas');
-    const ctx = canvas.getContext('2d');
+    let state = loadState();
 
-    coachNote.value = state.coachNote;
-    studentName.value = state.studentName;
-    sessionDate.value = state.sessionDate;
+    studentNameInput.value = state.studentName;
+    sessionDateInput.value = state.sessionDate;
+    coachNoteInput.value = state.coachNote;
 
     function loadState() {
       try {
         const raw = localStorage.getItem(storageKey);
-        if (!raw) return {};
-        return JSON.parse(raw);
+        if (!raw) return structuredClone(defaultState);
+
+        const parsed = JSON.parse(raw);
+
+        return {
+          studentName: parsed.studentName ?? defaultState.studentName,
+          sessionDate: parsed.sessionDate ?? defaultState.sessionDate,
+          coachNote: parsed.coachNote ?? defaultState.coachNote,
+          values: { ...defaultState.values, ...(parsed.values || {}) },
+          forms: { ...defaultState.forms, ...(parsed.forms || {}) }
+        };
       } catch {
-        return {};
+        return structuredClone(defaultState);
       }
     }
 
@@ -617,60 +751,92 @@
     function saveState() {
       try {
         localStorage.setItem(storageKey, JSON.stringify(state));
-        setSaveStatus('Données sauvegardées automatiquement');
+        setSaveStatus("Données sauvegardées");
       } catch {
-        setSaveStatus('Erreur de sauvegarde locale');
+        setSaveStatus("Erreur de sauvegarde");
       }
     }
 
     function scheduleSave() {
-      setSaveStatus('Sauvegarde en cours...');
+      setSaveStatus("Sauvegarde en cours...");
       clearTimeout(saveTimer);
-      saveTimer = setTimeout(saveState, 180);
+      saveTimer = setTimeout(saveState, 160);
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function getYellowShade(value) {
+      const v = clamp(Number(value), 0, 10);
+      if (v === 0) return "#6f6f6f";
+
+      const shades = [
+        "#7a744d",
+        "#857c47",
+        "#918541",
+        "#9d8d3b",
+        "#aa9635",
+        "#b89f2f",
+        "#c7a829",
+        "#d8b922",
+        "#ebcb18",
+        "#ffe100"
+      ];
+
+      return shades[v - 1];
     }
 
     function createControls() {
-      controlsContainer.innerHTML = '';
+      controlsList.innerHTML = "";
 
       martialQualities.forEach((quality) => {
-        const card = document.createElement('div');
-        card.className = 'control-card';
-
         const value = state.values[quality.key];
 
+        const card = document.createElement("div");
+        card.className = "control-card";
+
         card.innerHTML = `
-          <div class="control-top">
-            <div class="label-block">
-              <div class="label">${quality.label}</div>
-              <div class="desc">${quality.description}</div>
+          <div class="control-head">
+            <div class="control-text">
+              <div class="control-title">${quality.label}</div>
+              <div class="control-desc">${quality.description}</div>
             </div>
-            <div class="value-pill" id="pill-${quality.key}">${value}/10</div>
+            <div
+              class="value-badge"
+              id="badge-${quality.key}"
+              style="color:${value > 0 ? '#111' : '#fff'}; background:${getYellowShade(value)};"
+            >${value}/10</div>
           </div>
           <div class="slider-row">
-            <div class="scale-value">0</div>
+            <div class="slider-edge">0</div>
             <input
               type="range"
               min="0"
               max="10"
               step="1"
               value="${value}"
-              aria-label="${quality.label}"
               data-key="${quality.key}"
+              aria-label="${quality.label}"
             />
-            <div class="scale-value">10</div>
+            <div class="slider-edge">10</div>
           </div>
         `;
 
-        controlsContainer.appendChild(card);
+        controlsList.appendChild(card);
       });
 
-      controlsContainer.querySelectorAll('input[type="range"]').forEach((slider) => {
-        slider.addEventListener('input', (event) => {
+      controlsList.querySelectorAll('input[type="range"]').forEach((slider) => {
+        slider.addEventListener("input", (event) => {
           const key = event.target.dataset.key;
-          state.values[key] = Number(event.target.value);
+          const value = Number(event.target.value);
 
-          const pill = document.getElementById(`pill-${key}`);
-          if (pill) pill.textContent = `${state.values[key]}/10`;
+          state.values[key] = value;
+
+          const badge = document.getElementById(`badge-${key}`);
+          badge.textContent = `${value}/10`;
+          badge.style.background = getYellowShade(value);
+          badge.style.color = value > 0 ? "#111" : "#fff";
 
           renderAll();
           scheduleSave();
@@ -678,33 +844,65 @@
       });
     }
 
-    function renderSummary() {
-      const entries = martialQualities.map((item) => ({ ...item, value: state.values[item.key] }));
-      const sum = entries.reduce((acc, item) => acc + item.value, 0);
-      const avg = sum / entries.length;
-      const best = [...entries].sort((a, b) => b.value - a.value)[0];
-      const lowest = [...entries].sort((a, b) => a.value - b.value)[0];
+    function createForms() {
+      formsGrid.innerHTML = "";
 
-      averageValue.textContent = `${avg.toFixed(1)} / 10`;
-      bestValue.textContent = `${best.label} (${best.value})`;
-      lowestValue.textContent = `${lowest.label} (${lowest.value})`;
+      martialForms.forEach((form) => {
+        const isActive = !!state.forms[form.key];
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `form-toggle${isActive ? " active" : ""}`;
+        btn.innerHTML = `
+          <span class="form-name">${form.label}</span>
+          <span class="form-state">${isActive ? "Validé" : "Non validé"}</span>
+        `;
+
+        btn.addEventListener("click", () => {
+          state.forms[form.key] = !state.forms[form.key];
+          createForms();
+          scheduleSave();
+        });
+
+        formsGrid.appendChild(btn);
+      });
     }
 
-    function renderQualityList() {
-      qualitiesList.innerHTML = martialQualities
-        .map((quality) => `
-          <div class="quality-row">
-            <span>${quality.label}</span>
-            <span>${state.values[quality.key]} / 10</span>
+    function renderQualitiesGrid() {
+      qualitiesGrid.innerHTML = martialQualities.map((quality) => {
+        const value = state.values[quality.key];
+        return `
+          <div class="quality-chip">
+            <span class="quality-chip-name">${quality.label}</span>
+            <span
+              class="quality-chip-value"
+              style="color:${getYellowShade(value)}"
+            >${value}/10</span>
           </div>
-        `)
-        .join('');
+        `;
+      }).join("");
+    }
+
+    function renderSummary() {
+      const entries = martialQualities.map((item) => ({
+        ...item,
+        value: Number(state.values[item.key] || 0)
+      }));
+
+      const total = entries.reduce((sum, item) => sum + item.value, 0);
+      const avg = total / entries.length;
+      const sortedHigh = [...entries].sort((a, b) => b.value - a.value);
+      const sortedLow = [...entries].sort((a, b) => a.value - b.value);
+
+      averageValue.textContent = `${avg.toFixed(1)} / 10`;
+      bestValue.textContent = `${sortedHigh[0].label} (${sortedHigh[0].value})`;
+      lowestValue.textContent = `${sortedLow[0].label} (${sortedLow[0].value})`;
     }
 
     function resizeCanvasForDisplay() {
       const ratio = window.devicePixelRatio || 1;
-      const box = canvas.getBoundingClientRect();
-      const size = Math.min(box.width, box.height || box.width);
+      const rect = canvas.getBoundingClientRect();
+      const size = Math.max(240, Math.floor(Math.min(rect.width, rect.height || rect.width)));
       canvas.width = Math.floor(size * ratio);
       canvas.height = Math.floor(size * ratio);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -718,24 +916,28 @@
       const height = size;
       const centerX = width / 2;
       const centerY = height / 2;
-      const radius = Math.min(width, height) * 0.33;
-      const levels = 5;
+      const radius = Math.min(width, height) * 0.31;
+      const levels = 10;
       const angleStep = (Math.PI * 2) / martialQualities.length;
 
       ctx.clearRect(0, 0, width, height);
 
       for (let level = 1; level <= levels; level++) {
         const currentRadius = (radius / levels) * level;
+
         ctx.beginPath();
         for (let i = 0; i < martialQualities.length; i++) {
           const angle = -Math.PI / 2 + i * angleStep;
           const x = centerX + Math.cos(angle) * currentRadius;
           const y = centerY + Math.sin(angle) * currentRadius;
+
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
         ctx.closePath();
-        ctx.strokeStyle = level === levels ? 'rgba(255,255,255,.16)' : 'rgba(255,255,255,.08)';
+        ctx.strokeStyle = level === levels
+          ? "rgba(255,255,255,.16)"
+          : "rgba(255,255,255,.08)";
         ctx.lineWidth = 1;
         ctx.stroke();
       }
@@ -748,128 +950,158 @@
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.lineTo(x, y);
-        ctx.strokeStyle = 'rgba(255,255,255,.08)';
+        ctx.strokeStyle = "rgba(255,255,255,.08)";
+        ctx.lineWidth = 1;
         ctx.stroke();
       });
 
-      const gradient = ctx.createRadialGradient(centerX, centerY, radius * .1, centerX, centerY, radius);
-      gradient.addColorStop(0, 'rgba(255,255,255,.50)');
-      gradient.addColorStop(.55, 'rgba(180,180,180,.28)');
-      gradient.addColorStop(1, 'rgba(120,120,120,.10)');
+      const points = martialQualities.map((quality, index) => {
+        const value = Number(state.values[quality.key] || 0);
+        const normalized = value / 10;
+        const angle = -Math.PI / 2 + index * angleStep;
+        const pointRadius = radius * normalized;
+
+        return {
+          label: quality.label,
+          value,
+          x: centerX + Math.cos(angle) * pointRadius,
+          y: centerY + Math.sin(angle) * pointRadius,
+          angle
+        };
+      });
 
       ctx.beginPath();
-      martialQualities.forEach((quality, index) => {
-        const value = state.values[quality.key] / 10;
-        const currentRadius = radius * value;
-        const angle = -Math.PI / 2 + index * angleStep;
-        const x = centerX + Math.cos(angle) * currentRadius;
-        const y = centerY + Math.sin(angle) * currentRadius;
-        if (index === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
+      points.forEach((point, index) => {
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
       });
       ctx.closePath();
+
+      const gradient = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        radius * 0.08,
+        centerX,
+        centerY,
+        radius
+      );
+      gradient.addColorStop(0, "rgba(255, 229, 102, .42)");
+      gradient.addColorStop(.55, "rgba(255, 214, 61, .26)");
+      gradient.addColorStop(1, "rgba(255, 190, 0, .08)");
+
       ctx.fillStyle = gradient;
-      ctx.strokeStyle = 'rgba(255,255,255,.85)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255, 225, 80, .95)";
+      ctx.lineWidth = 2.2;
       ctx.fill();
       ctx.stroke();
 
-      martialQualities.forEach((quality, index) => {
-        const value = state.values[quality.key] / 10;
-        const currentRadius = radius * value;
-        const angle = -Math.PI / 2 + index * angleStep;
-        const x = centerX + Math.cos(angle) * currentRadius;
-        const y = centerY + Math.sin(angle) * currentRadius;
-
+      points.forEach((point) => {
         ctx.beginPath();
-        ctx.arc(x, y, 4.6, 0, Math.PI * 2);
-        ctx.fillStyle = '#efefef';
+        ctx.arc(point.x, point.y, 4.8, 0, Math.PI * 2);
+        ctx.fillStyle = getYellowShade(point.value);
         ctx.fill();
+      });
 
+      martialQualities.forEach((quality, index) => {
+        const angle = -Math.PI / 2 + index * angleStep;
         const labelRadius = radius + 28;
         const lx = centerX + Math.cos(angle) * labelRadius;
         const ly = centerY + Math.sin(angle) * labelRadius;
 
-        ctx.fillStyle = 'rgba(235,235,235,.92)';
-        ctx.font = `${Math.max(11, Math.min(14, width * 0.023))}px Inter, sans-serif`;
-        ctx.textAlign = lx < centerX - 10 ? 'right' : lx > centerX + 10 ? 'left' : 'center';
-        ctx.textBaseline = ly < centerY ? 'bottom' : 'top';
+        ctx.fillStyle = "rgba(240,240,240,.92)";
+        ctx.font = `${Math.max(11, Math.min(14, width * 0.024))}px Inter, Arial, sans-serif`;
+        ctx.textAlign =
+          lx < centerX - 10 ? "right" :
+          lx > centerX + 10 ? "left" :
+          "center";
+        ctx.textBaseline = ly < centerY ? "bottom" : "top";
         ctx.fillText(quality.label, lx, ly);
       });
 
       ctx.beginPath();
-      ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,.8)';
+      ctx.arc(centerX, centerY, 3.2, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff3b0";
       ctx.fill();
     }
 
     function renderAll() {
       renderSummary();
-      renderQualityList();
+      renderQualitiesGrid();
       drawRadar();
     }
 
-    function updateMetaFields() {
-      state.studentName = studentName.value;
-      state.sessionDate = sessionDate.value;
-      state.coachNote = coachNote.value;
+    function syncMetaState() {
+      state.studentName = studentNameInput.value;
+      state.sessionDate = sessionDateInput.value;
+      state.coachNote = coachNoteInput.value;
       scheduleSave();
     }
 
-    resetBtn.addEventListener('click', () => {
-      state = JSON.parse(JSON.stringify(defaultState));
-      studentName.value = '';
-      sessionDate.value = '';
-      coachNote.value = '';
-      createControls();
-      renderAll();
-      scheduleSave();
-    });
+    studentNameInput.addEventListener("input", syncMetaState, { passive: true });
+    sessionDateInput.addEventListener("input", syncMetaState, { passive: true });
+    coachNoteInput.addEventListener("input", syncMetaState, { passive: true });
 
-    randomBtn.addEventListener('click', () => {
+    randomBtn.addEventListener("click", () => {
       martialQualities.forEach((quality) => {
         state.values[quality.key] = Math.floor(Math.random() * 11);
       });
+
+      martialForms.forEach((form) => {
+        state.forms[form.key] = Math.random() > 0.5;
+      });
+
       createControls();
+      createForms();
       renderAll();
       scheduleSave();
     });
 
-    coachNote.addEventListener('input', updateMetaFields, { passive: true });
-    studentName.addEventListener('input', updateMetaFields, { passive: true });
-    sessionDate.addEventListener('input', updateMetaFields, { passive: true });
-    window.addEventListener('resize', drawRadar, { passive: true });
+    resetBtn.addEventListener("click", () => {
+      state = structuredClone(defaultState);
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', async () => {
+      studentNameInput.value = "";
+      sessionDateInput.value = "";
+      coachNoteInput.value = "";
+
+      createControls();
+      createForms();
+      renderAll();
+      scheduleSave();
+    });
+
+    window.addEventListener("resize", drawRadar, { passive: true });
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
         try {
-          await navigator.serviceWorker.register('./service-worker.js');
-        } catch (e) {
-          console.error('Service Worker non enregistré', e);
+          await navigator.serviceWorker.register("./service-worker.js");
+        } catch (error) {
+          console.error("Erreur Service Worker :", error);
         }
       });
     }
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-flex';
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBtn.style.display = "block";
     });
 
-    installBtn.addEventListener('click', async () => {
+    installBtn.addEventListener("click", async () => {
       if (!deferredPrompt) return;
       deferredPrompt.prompt();
       await deferredPrompt.userChoice;
       deferredPrompt = null;
-      installBtn.style.display = 'none';
+      installBtn.style.display = "none";
     });
 
-    window.addEventListener('appinstalled', () => {
-      installBtn.style.display = 'none';
-      setSaveStatus('Application installée');
+    window.addEventListener("appinstalled", () => {
+      installBtn.style.display = "none";
+      setSaveStatus("Application installée");
     });
 
     createControls();
+    createForms();
     renderAll();
     saveState();
   </script>
