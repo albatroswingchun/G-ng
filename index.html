@@ -11,7 +11,7 @@
     name="description"
     content="Application d'évaluation martiale avec radar interactif, sauvegarde automatique et installation PWA."
   />
-  <title>Shì</title>
+  <title>Gōng</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
@@ -383,6 +383,7 @@
       color: #ececec;
       padding: 14px 14px;
       min-height: 58px;
+      cursor: pointer;
     }
 
     .form-toggle.active {
@@ -515,7 +516,7 @@
         <div class="top-title-row">
           <div class="brand-block">
             <div class="eyebrow">Profil martial</div>
-            <h1>Shì</h1>
+            <h1>Gōng</h1>
             <p class="top-sub">
               Radar principal, mise à jour en direct, nuances du gris au jaune.
             </p>
@@ -684,7 +685,7 @@
       { key: "baton", label: "Bâton long" }
     ];
 
-    const storageKey = "shi-martial-app-v1";
+    const storageKey = "gong-martial-app-v1";
 
     const defaultState = {
       studentName: "",
@@ -725,10 +726,14 @@
     sessionDateInput.value = state.sessionDate;
     coachNoteInput.value = state.coachNote;
 
+    function cloneDefaultState() {
+      return JSON.parse(JSON.stringify(defaultState));
+    }
+
     function loadState() {
       try {
         const raw = localStorage.getItem(storageKey);
-        if (!raw) return structuredClone(defaultState);
+        if (!raw) return cloneDefaultState();
 
         const parsed = JSON.parse(raw);
 
@@ -740,7 +745,7 @@
           forms: { ...defaultState.forms, ...(parsed.forms || {}) }
         };
       } catch {
-        return structuredClone(defaultState);
+        return cloneDefaultState();
       }
     }
 
@@ -769,6 +774,7 @@
 
     function getYellowShade(value) {
       const v = clamp(Number(value), 0, 10);
+
       if (v === 0) return "#6f6f6f";
 
       const shades = [
@@ -1057,7 +1063,7 @@
     });
 
     resetBtn.addEventListener("click", () => {
-      state = structuredClone(defaultState);
+      state = cloneDefaultState();
 
       studentNameInput.value = "";
       sessionDateInput.value = "";
