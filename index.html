@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Application d'évaluation martiale avec diagramme radar, sauvegarde automatique et installation PWA." />
+  <title>Évaluation Martiale</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #111111;
+      --panel-2: #171717;
+      --panel-3: #1d1d1d;
+      --line: #2d2d2d;
+      --soft-line: #232323;
+      --text: #f2f2f2;
+      --muted: #b8b8b8;
+      --muted-2: #8a8a8a;
+      --shadow: 0 18px 50px rgba(0,0,0,.42);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,.05), transparent 30%),
+        linear-gradient(180deg, #0a0a0a 0%, #040404 100%);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+      min-height: 100%;
+    }
+
+    body {
+      padding: 16px;
+    }
+
+    .app {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .panel-header {
+      padding: 22px 22px 16px;
+      border-bottom: 1px solid var(--soft-line);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    }
+
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--muted-2);
+      margin-bottom: 8px;
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(1.7rem, 2.6vw, 2.4rem);
+      line-height: 1.08;
+      letter-spacing: -.03em;
+    }
+
+    .sub {
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.5;
+      font-size: .98rem;
+    }
+
+    .controls-wrap {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      max-height: calc(100vh - 180px);
+      overflow: auto;
+    }
+
+    .control-card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .control-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .label-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .label {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    .desc {
+      color: var(--muted-2);
+      font-size: .86rem;
+      line-height: 1.35;
+    }
+
+    .value-pill {
+      min-width: 58px;
+      text-align: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #252525, #171717);
+      border: 1px solid rgba(255,255,255,.06);
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fff;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 34px 1fr 34px;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .scale-value {
+      text-align: center;
+      color: var(--muted-2);
+      font-size: .82rem;
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 100%;
+      height: 18px;
+      background: transparent;
+      margin: 0;
+    }
+
+    input[type="range"]:focus {
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #686868, #bdbdbd);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #686868, #bdbdbd);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid #ededed;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #9f9f9f 70%, #575757 100%);
+      margin-top: -10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.4);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid #ededed;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #9f9f9f 70%, #575757 100%);
+      box-shadow: 0 6px 18px rgba(0,0,0,.4);
+    }
+
+    .right-panel {
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+    }
+
+    .visual-wrap {
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .score-card,
+    .notes-card,
+    .canvas-card,
+    .session-card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid rgba(255,255,255,.05);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+    }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .score-item {
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border: 1px solid rgba(255,255,255,.04);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .score-item .mini {
+      color: var(--muted-2);
+      font-size: .76rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      margin-bottom: 6px;
+    }
+
+    .score-item strong {
+      font-size: 1.35rem;
+      letter-spacing: -.03em;
+      line-height: 1.2;
+      display: block;
+    }
+
+    .canvas-box {
+      aspect-ratio: 1 / 1;
+      width: 100%;
+      background: radial-gradient(circle at center, rgba(255,255,255,.04), rgba(255,255,255,.015) 35%, transparent 65%);
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      display: block;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      letter-spacing: -.02em;
+    }
+
+    .qualities-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .quality-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(255,255,255,.04);
+    }
+
+    .quality-row span:first-child {
+      color: #e9e9e9;
+      font-size: .93rem;
+    }
+
+    .quality-row span:last-child {
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .notes-card textarea,
+    .session-card input,
+    .session-card select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 16px;
+      background: #0c0c0c;
+      color: #f0f0f0;
+      padding: 14px 16px;
+      font: inherit;
+      line-height: 1.5;
+    }
+
+    .notes-card textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .notes-card textarea::placeholder,
+    .session-card input::placeholder {
+      color: #767676;
+    }
+
+    .session-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted-2);
+      font-size: .9rem;
+    }
+
+    .install-btn {
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, #2a2a2a, #181818);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .actions {
+      padding: 18px;
+      border-top: 1px solid var(--soft-line);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .btn {
+      flex: 1 1 180px;
+      min-height: 54px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      transition: transform .18s ease;
+    }
+
+    .btn:active {
+      transform: scale(.985);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #f0f0f0, #9a9a9a);
+      color: #060606;
+      box-shadow: 0 10px 24px rgba(255,255,255,.08);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, #222, #151515);
+      color: #ededed;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .footer-note {
+      color: var(--muted-2);
+      font-size: .84rem;
+      line-height: 1.45;
+      padding: 0 18px 18px;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .controls-wrap {
+        max-height: none;
+      }
+
+      .score-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 10px;
+      }
+
+      .panel-header,
+      .controls-wrap,
+      .visual-wrap,
+      .actions {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .qualities-list,
+      .session-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .score-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .control-card,
+      .score-card,
+      .notes-card,
+      .canvas-card,
+      .session-card {
+        padding: 14px;
+      }
+
+      .value-pill {
+        min-width: 52px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="panel left-panel">
+      <div class="panel-header">
+        <div class="eyebrow">Tableau d'évaluation</div>
+        <h1>Profil martial interactif</h1>
+        <p class="sub">
+          Ajuste chaque qualité avec un curseur tactile de 0 à 10. Le diagramme radar se met à jour en direct.
+        </p>
+      </div>
+
+      <div id="controls" class="controls-wrap"></div>
+    </section>
+
+    <section class="panel right-panel">
+      <div class="panel-header">
+        <div class="eyebrow">Synthèse visuelle</div>
+        <h2>Vue d'ensemble</h2>
+        <p class="sub">Sauvegarde automatique locale et installation en application possible.</p>
+      </div>
+
+      <div class="visual-wrap">
+        <div class="session-card">
+          <div class="section-title">Informations de séance</div>
+          <div class="session-grid">
+            <input id="studentName" type="text" placeholder="Nom de l'élève" />
+            <input id="sessionDate" type="date" />
+          </div>
+          <div class="status-row">
+            <span id="saveStatus">Sauvegarde automatique active</span>
+            <button id="installBtn" class="install-btn">Installer l'application</button>
+          </div>
+        </div>
+
+        <div class="score-card">
+          <div class="section-title">Résumé</div>
+          <div class="score-grid">
+            <div class="score-item">
+              <div class="mini">Note globale</div>
+              <strong id="averageValue">0.0 / 10</strong>
+            </div>
+            <div class="score-item">
+              <div class="mini">Qualité la plus forte</div>
+              <strong id="bestValue">—</strong>
+            </div>
+            <div class="score-item">
+              <div class="mini">Axe prioritaire</div>
+              <strong id="lowestValue">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="canvas-card">
+          <div class="section-title">Diagramme radar</div>
+          <div class="canvas-box">
+            <canvas id="radarCanvas" width="700" height="700"></canvas>
+          </div>
+        </div>
+
+        <div class="score-card">
+          <div class="section-title">Détail des qualités</div>
+          <div id="qualitiesList" class="qualities-list"></div>
+        </div>
+
+        <div class="notes-card">
+          <div class="section-title">Observation / commentaire</div>
+          <textarea id="coachNote" placeholder="Exemple : bonne structure générale, mais relâchement encore irrégulier sur les enchaînements rapides."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="resetBtn">Réinitialiser</button>
+        <button class="btn btn-secondary" id="randomBtn">Exemple auto</button>
+      </div>
+
+      <div class="footer-note">
+        Les données sont enregistrées automatiquement dans le navigateur de l'appareil.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const martialQualities = [
+      { key: 'force', label: 'Force', description: 'Capacité à produire de la puissance physique.' },
+      { key: 'relachement', label: 'Relâchement', description: 'Absence de tension parasite et fluidité.' },
+      { key: 'precision', label: 'Précision', description: 'Justesse technique et placement.' },
+      { key: 'structure', label: 'Structure', description: 'Alignement, stabilité et organisation corporelle.' },
+      { key: 'rapidite', label: 'Rapidité', description: 'Vitesse d’exécution et temps de réaction.' },
+      { key: 'souplesse', label: 'Souplesse', description: 'Mobilité générale et amplitude utile.' },
+      { key: 'equilibre', label: 'Équilibre', description: 'Gestion des appuis et stabilité dynamique.' },
+      { key: 'coordination', label: 'Coordination', description: 'Capacité à synchroniser le corps efficacement.' },
+      { key: 'timing', label: 'Timing', description: 'Choix du bon moment pour agir.' },
+      { key: 'endurance', label: 'Endurance', description: 'Capacité à maintenir l’effort dans le temps.' },
+      { key: 'explosivite', label: 'Explosivité', description: 'Capacité à déclencher vite et fort.' },
+      { key: 'ancrage', label: 'Ancrage', description: 'Connexion au sol et enracinement.' }
+    ];
+
+    const storageKey = 'martial-evaluation-data-v2';
+
+    const defaultState = {
+      studentName: '',
+      sessionDate: '',
+      coachNote: '',
+      values: martialQualities.reduce((acc, item) => {
+        acc[item.key] = 5;
+        return acc;
+      }, {})
+    };
+
+    let deferredPrompt = null;
+    let saveTimer = null;
+
+    const savedState = loadState();
+    let state = {
+      studentName: savedState.studentName ?? defaultState.studentName,
+      sessionDate: savedState.sessionDate ?? defaultState.sessionDate,
+      coachNote: savedState.coachNote ?? defaultState.coachNote,
+      values: { ...defaultState.values, ...(savedState.values || {}) }
+    };
+
+    const controlsContainer = document.getElementById('controls');
+    const qualitiesList = document.getElementById('qualitiesList');
+    const averageValue = document.getElementById('averageValue');
+    const bestValue = document.getElementById('bestValue');
+    const lowestValue = document.getElementById('lowestValue');
+    const coachNote = document.getElementById('coachNote');
+    const studentName = document.getElementById('studentName');
+    const sessionDate = document.getElementById('sessionDate');
+    const saveStatus = document.getElementById('saveStatus');
+    const installBtn = document.getElementById('installBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const randomBtn = document.getElementById('randomBtn');
+    const canvas = document.getElementById('radarCanvas');
+    const ctx = canvas.getContext('2d');
+
+    coachNote.value = state.coachNote;
+    studentName.value = state.studentName;
+    sessionDate.value = state.sessionDate;
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return {};
+        return JSON.parse(raw);
+      } catch {
+        return {};
+      }
+    }
+
+    function setSaveStatus(text) {
+      saveStatus.textContent = text;
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        setSaveStatus('Données sauvegardées automatiquement');
+      } catch {
+        setSaveStatus('Erreur de sauvegarde locale');
+      }
+    }
+
+    function scheduleSave() {
+      setSaveStatus('Sauvegarde en cours...');
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveState, 180);
+    }
+
+    function createControls() {
+      controlsContainer.innerHTML = '';
+
+      martialQualities.forEach((quality) => {
+        const card = document.createElement('div');
+        card.className = 'control-card';
+
+        const value = state.values[quality.key];
+
+        card.innerHTML = `
+          <div class="control-top">
+            <div class="label-block">
+              <div class="label">${quality.label}</div>
+              <div class="desc">${quality.description}</div>
+            </div>
+            <div class="value-pill" id="pill-${quality.key}">${value}/10</div>
+          </div>
+          <div class="slider-row">
+            <div class="scale-value">0</div>
+            <input
+              type="range"
+              min="0"
+              max="10"
+              step="1"
+              value="${value}"
+              aria-label="${quality.label}"
+              data-key="${quality.key}"
+            />
+            <div class="scale-value">10</div>
+          </div>
+        `;
+
+        controlsContainer.appendChild(card);
+      });
+
+      controlsContainer.querySelectorAll('input[type="range"]').forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+          const key = event.target.dataset.key;
+          state.values[key] = Number(event.target.value);
+
+          const pill = document.getElementById(`pill-${key}`);
+          if (pill) pill.textContent = `${state.values[key]}/10`;
+
+          renderAll();
+          scheduleSave();
+        }, { passive: true });
+      });
+    }
+
+    function renderSummary() {
+      const entries = martialQualities.map((item) => ({ ...item, value: state.values[item.key] }));
+      const sum = entries.reduce((acc, item) => acc + item.value, 0);
+      const avg = sum / entries.length;
+      const best = [...entries].sort((a, b) => b.value - a.value)[0];
+      const lowest = [...entries].sort((a, b) => a.value - b.value)[0];
+
+      averageValue.textContent = `${avg.toFixed(1)} / 10`;
+      bestValue.textContent = `${best.label} (${best.value})`;
+      lowestValue.textContent = `${lowest.label} (${lowest.value})`;
+    }
+
+    function renderQualityList() {
+      qualitiesList.innerHTML = martialQualities
+        .map((quality) => `
+          <div class="quality-row">
+            <span>${quality.label}</span>
+            <span>${state.values[quality.key]} / 10</span>
+          </div>
+        `)
+        .join('');
+    }
+
+    function resizeCanvasForDisplay() {
+      const ratio = window.devicePixelRatio || 1;
+      const box = canvas.getBoundingClientRect();
+      const size = Math.min(box.width, box.height || box.width);
+      canvas.width = Math.floor(size * ratio);
+      canvas.height = Math.floor(size * ratio);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(ratio, ratio);
+      return size;
+    }
+
+    function drawRadar() {
+      const size = resizeCanvasForDisplay();
+      const width = size;
+      const height = size;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = Math.min(width, height) * 0.33;
+      const levels = 5;
+      const angleStep = (Math.PI * 2) / martialQualities.length;
+
+      ctx.clearRect(0, 0, width, height);
+
+      for (let level = 1; level <= levels; level++) {
+        const currentRadius = (radius / levels) * level;
+        ctx.beginPath();
+        for (let i = 0; i < martialQualities.length; i++) {
+          const angle = -Math.PI / 2 + i * angleStep;
+          const x = centerX + Math.cos(angle) * currentRadius;
+          const y = centerY + Math.sin(angle) * currentRadius;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = level === levels ? 'rgba(255,255,255,.16)' : 'rgba(255,255,255,.08)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      martialQualities.forEach((quality, index) => {
+        const angle = -Math.PI / 2 + index * angleStep;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = 'rgba(255,255,255,.08)';
+        ctx.stroke();
+      });
+
+      const gradient = ctx.createRadialGradient(centerX, centerY, radius * .1, centerX, centerY, radius);
+      gradient.addColorStop(0, 'rgba(255,255,255,.50)');
+      gradient.addColorStop(.55, 'rgba(180,180,180,.28)');
+      gradient.addColorStop(1, 'rgba(120,120,120,.10)');
+
+      ctx.beginPath();
+      martialQualities.forEach((quality, index) => {
+        const value = state.values[quality.key] / 10;
+        const currentRadius = radius * value;
+        const angle = -Math.PI / 2 + index * angleStep;
+        const x = centerX + Math.cos(angle) * currentRadius;
+        const y = centerY + Math.sin(angle) * currentRadius;
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.strokeStyle = 'rgba(255,255,255,.85)';
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+
+      martialQualities.forEach((quality, index) => {
+        const value = state.values[quality.key] / 10;
+        const currentRadius = radius * value;
+        const angle = -Math.PI / 2 + index * angleStep;
+        const x = centerX + Math.cos(angle) * currentRadius;
+        const y = centerY + Math.sin(angle) * currentRadius;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 4.6, 0, Math.PI * 2);
+        ctx.fillStyle = '#efefef';
+        ctx.fill();
+
+        const labelRadius = radius + 28;
+        const lx = centerX + Math.cos(angle) * labelRadius;
+        const ly = centerY + Math.sin(angle) * labelRadius;
+
+        ctx.fillStyle = 'rgba(235,235,235,.92)';
+        ctx.font = `${Math.max(11, Math.min(14, width * 0.023))}px Inter, sans-serif`;
+        ctx.textAlign = lx < centerX - 10 ? 'right' : lx > centerX + 10 ? 'left' : 'center';
+        ctx.textBaseline = ly < centerY ? 'bottom' : 'top';
+        ctx.fillText(quality.label, lx, ly);
+      });
+
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,.8)';
+      ctx.fill();
+    }
+
+    function renderAll() {
+      renderSummary();
+      renderQualityList();
+      drawRadar();
+    }
+
+    function updateMetaFields() {
+      state.studentName = studentName.value;
+      state.sessionDate = sessionDate.value;
+      state.coachNote = coachNote.value;
+      scheduleSave();
+    }
+
+    resetBtn.addEventListener('click', () => {
+      state = JSON.parse(JSON.stringify(defaultState));
+      studentName.value = '';
+      sessionDate.value = '';
+      coachNote.value = '';
+      createControls();
+      renderAll();
+      scheduleSave();
+    });
+
+    randomBtn.addEventListener('click', () => {
+      martialQualities.forEach((quality) => {
+        state.values[quality.key] = Math.floor(Math.random() * 11);
+      });
+      createControls();
+      renderAll();
+      scheduleSave();
+    });
+
+    coachNote.addEventListener('input', updateMetaFields, { passive: true });
+    studentName.addEventListener('input', updateMetaFields, { passive: true });
+    sessionDate.addEventListener('input', updateMetaFields, { passive: true });
+    window.addEventListener('resize', drawRadar, { passive: true });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          await navigator.serviceWorker.register('./service-worker.js');
+        } catch (e) {
+          console.error('Service Worker non enregistré', e);
+        }
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      installBtn.style.display = 'none';
+      setSaveStatus('Application installée');
+    });
+
+    createControls();
+    renderAll();
+    saveState();
+  </script>
+</body>
+</html>
