@@ -19,6 +19,7 @@
   <style>
     :root {
       --bg: #050505;
+      --bg-2: #0b0b0b;
       --panel: #121212;
       --panel-2: #171717;
       --line: #242424;
@@ -27,7 +28,6 @@
       --muted: #a0a0a0;
       --muted-2: #757575;
       --green: #1faa59;
-      --yellow-soft: #fff3b0;
       --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
       --radius-xl: 22px;
       --radius-lg: 16px;
@@ -39,7 +39,8 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       min-height: 100%;
@@ -93,7 +94,10 @@
       margin-bottom: 6px;
     }
 
-    h1, h2, h3, p {
+    h1,
+    h2,
+    h3,
+    p {
       margin: 0;
     }
 
@@ -125,10 +129,11 @@
       box-shadow: var(--shadow);
     }
 
+    /* CHANGEMENT VISIBLE : radar vraiment plus petit */
     .radar-canvas-wrap {
       width: 100%;
-      max-width: 320px;
-      height: 320px;
+      max-width: 240px;
+      height: 240px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -168,7 +173,7 @@
     }
 
     .summary-value {
-      color: var(--yellow-soft);
+      color: #fff3b0;
       font-weight: 800;
       font-size: 1rem;
       line-height: 1.2;
@@ -487,8 +492,8 @@
       }
 
       .radar-canvas-wrap {
-        max-width: 300px;
-        height: 300px;
+        max-width: 220px;
+        height: 220px;
       }
     }
   </style>
@@ -656,7 +661,7 @@
       { key: "baton", label: "Bâton long" }
     ];
 
-    const storageKey = "gong-martial-app-v2";
+    const storageKey = "gong-martial-app-v3";
 
     const defaultState = {
       studentName: "",
@@ -876,7 +881,7 @@
     function resizeCanvasForDisplay() {
       const ratio = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-      const size = Math.max(260, Math.floor(Math.min(rect.width, rect.height || rect.width)));
+      const size = Math.max(220, Math.floor(Math.min(rect.width, rect.height || rect.width)));
       canvas.width = Math.floor(size * ratio);
       canvas.height = Math.floor(size * ratio);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -884,10 +889,8 @@
       return size;
     }
 
-    function drawWrappedLabel(ctx, text, x, y, align, fontSize) {
+    function drawWrappedLabel(text, x, y, maxWidth, lineHeight) {
       const words = text.split(" ");
-      const maxWidth = 82;
-      const lineHeight = fontSize + 2;
       const lines = [];
       let currentLine = "";
 
@@ -908,8 +911,8 @@
       const totalHeight = (lines.length - 1) * lineHeight;
       const startY = y - totalHeight / 2;
 
-      lines.forEach((line, i) => {
-        ctx.fillText(line, x, startY + i * lineHeight);
+      lines.forEach((line, index) => {
+        ctx.fillText(line, x, startY + index * lineHeight);
       });
     }
 
@@ -920,7 +923,8 @@
       const centerX = width / 2;
       const centerY = height / 2;
 
-      const outerPadding = 62;
+      /* CHANGEMENT VISIBLE : rayon plus petit pour laisser la place aux mots */
+      const outerPadding = 64;
       const radius = Math.min(width, height) / 2 - outerPadding;
 
       const levels = 10;
@@ -970,6 +974,7 @@
         return {
           label: quality.label,
           value,
+          angle,
           x: centerX + Math.cos(angle) * pointRadius,
           y: centerY + Math.sin(angle) * pointRadius
         };
@@ -1002,32 +1007,33 @@
 
       points.forEach((point) => {
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 4.8, 0, Math.PI * 2);
+        ctx.arc(point.x, point.y, 4.4, 0, Math.PI * 2);
         ctx.fillStyle = getYellowShade(point.value);
         ctx.fill();
       });
 
-      const fontSize = Math.max(10, Math.min(13, width * 0.04));
+      const fontSize = Math.max(9, Math.min(11, width * 0.042));
+      const lineHeight = fontSize + 2;
+
       ctx.font = `${fontSize}px Inter, Arial, sans-serif`;
       ctx.fillStyle = "rgba(240,240,240,.92)";
       ctx.textBaseline = "middle";
 
       martialQualities.forEach((quality, index) => {
         const angle = -Math.PI / 2 + index * angleStep;
-        const labelRadius = radius + 30;
+        const labelRadius = radius + 22;
         const lx = centerX + Math.cos(angle) * labelRadius;
         const ly = centerY + Math.sin(angle) * labelRadius;
 
-        let align = "center";
-        if (lx < centerX - 20) align = "right";
-        else if (lx > centerX + 20) align = "left";
+        if (lx < centerX - 16) ctx.textAlign = "right";
+        else if (lx > centerX + 16) ctx.textAlign = "left";
+        else ctx.textAlign = "center";
 
-        ctx.textAlign = align;
-        drawWrappedLabel(ctx, quality.label, lx, ly, align, fontSize);
+        drawWrappedLabel(quality.label, lx, ly, 58, lineHeight);
       });
 
       ctx.beginPath();
-      ctx.arc(centerX, centerY, 3.2, 0, Math.PI * 2);
+      ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
       ctx.fillStyle = "#fff3b0";
       ctx.fill();
     }
