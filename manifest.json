@@ -1,7 +1,7 @@
 {
   "name": "Gōng",
   "short_name": "Gōng",
-  "description": "Application d'évaluation martiale avec radar interactif.",
+  "description": "Application d'évaluation martiale avec radar interactif, historique et validation des formes.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050505",
