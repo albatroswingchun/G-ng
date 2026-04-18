@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
   />
   <meta name="theme-color" content="#050505" />
   <meta
     name="description"
-    content="Application d'évaluation martiale avec radar interactif, sauvegarde automatique et installation PWA."
+    content="Gōng, application d'évaluation martiale avec radar interactif, historique et validation des formes."
   />
   <title>Gōng</title>
 
@@ -19,16 +19,28 @@
   <style>
     :root {
       --bg: #050505;
-      --bg-2: #0b0b0b;
-      --panel: #121212;
+      --bg-soft: #0b0b0b;
+      --panel: #111111;
       --panel-2: #171717;
-      --line: #242424;
-      --line-soft: #1b1b1b;
+      --line: #232323;
+      --line-soft: #1a1a1a;
       --text: #f2f2f2;
-      --muted: #a0a0a0;
-      --muted-2: #757575;
-      --green: #1faa59;
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      --muted: #9d9d9d;
+      --muted-2: #737373;
+      --yellow-soft: #fff4b3;
+      --yellow-main: #ffe100;
+      --yellow-1: #7a744d;
+      --yellow-2: #857c47;
+      --yellow-3: #918541;
+      --yellow-4: #9d8d3b;
+      --yellow-5: #aa9635;
+      --yellow-6: #b89f2f;
+      --yellow-7: #c7a829;
+      --yellow-8: #d8b922;
+      --yellow-9: #ebcb18;
+      --yellow-10: #ffe100;
+      --gray-slider: #5f5f5f;
+      --shadow: 0 18px 40px rgba(0,0,0,.34);
       --radius-xl: 22px;
       --radius-lg: 16px;
       --radius-md: 12px;
@@ -39,16 +51,15 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       padding: 0;
       min-height: 100%;
       overflow-x: hidden;
       overflow-y: auto;
       background:
-        radial-gradient(circle at top, rgba(255,255,255,.04), transparent 30%),
-        linear-gradient(180deg, #080808 0%, #040404 100%);
+        radial-gradient(circle at top, rgba(255,255,255,.04), transparent 28%),
+        linear-gradient(180deg, #090909 0%, #040404 100%);
       color: var(--text);
       font-family: Inter, Arial, sans-serif;
     }
@@ -57,89 +68,144 @@
       padding: 0;
     }
 
-    .app-shell {
+    button, input, textarea {
+      font: inherit;
+    }
+
+    .app {
       width: 100%;
       min-height: 100vh;
+      padding: 14px 14px 28px;
     }
 
-    .radar-top {
-      position: relative;
-      z-index: 1;
-      background: transparent;
-      padding: 16px 14px 0;
-    }
-
-    .radar-top-inner {
-      max-width: 920px;
+    .container {
+      width: 100%;
+      max-width: 860px;
       margin: 0 auto;
     }
 
-    .top-title-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
+    h1, h2, h3, p {
+      margin: 0;
     }
 
-    .brand-block {
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .brand {
       min-width: 0;
     }
 
     .eyebrow {
-      color: var(--muted-2);
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
       font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted-2);
       margin-bottom: 6px;
     }
 
-    h1,
-    h2,
-    h3,
-    p {
-      margin: 0;
+    .title {
+      font-size: clamp(1.45rem, 3vw, 2rem);
+      letter-spacing: -.03em;
+      line-height: 1.05;
     }
 
-    h1 {
-      font-size: clamp(1.3rem, 2.8vw, 2rem);
-      letter-spacing: -0.03em;
-      line-height: 1.05;
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .top-btn,
+    .user-pill,
+    .menu-btn {
+      min-height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, #202020, #131313);
+      color: #ececec;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .menu-btn {
+      min-width: 44px;
+      width: 44px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .user-pill {
+      display: none;
     }
 
     .save-pill {
       padding: 10px 14px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.06);
-      background: linear-gradient(180deg, #1f1f1f, #131313);
-      color: #e7e7e7;
-      font-size: 0.84rem;
-      font-weight: 700;
-      white-space: nowrap;
-      min-width: 170px;
       text-align: center;
+      font-size: .84rem;
+      font-weight: 700;
+      color: #e9e9e9;
+      background: linear-gradient(180deg, #202020, #131313);
+      border: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 14px;
     }
 
-    .radar-card {
-      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.01));
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.012));
       border: 1px solid rgba(255,255,255,.05);
       border-radius: var(--radius-xl);
-      padding: 12px;
-      overflow: hidden;
       box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 16px;
     }
 
-    /* CHANGEMENT VISIBLE : radar vraiment plus petit */
-    .radar-canvas-wrap {
+    .card-header {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--line-soft);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .card-sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: .92rem;
+      line-height: 1.45;
+    }
+
+    .card-body {
+      padding: 14px;
+    }
+
+    .radar-shell {
+      padding: 14px;
+    }
+
+    .radar-box {
       width: 100%;
-      max-width: 240px;
-      height: 240px;
+      max-width: 300px;
+      height: 300px;
       margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at center, rgba(255,255,255,.03), transparent 60%);
       border-radius: 18px;
+      background: radial-gradient(circle at center, rgba(255,255,255,.03), transparent 60%);
     }
 
     canvas {
@@ -147,106 +213,6 @@
       height: 100%;
       display: block;
       touch-action: none;
-    }
-
-    .summary-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .summary-box {
-      background: linear-gradient(180deg, #151515, #101010);
-      border: 1px solid rgba(255,255,255,.045);
-      border-radius: 14px;
-      padding: 12px;
-      min-width: 0;
-    }
-
-    .summary-label {
-      color: var(--muted-2);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 0.72rem;
-      margin-bottom: 6px;
-    }
-
-    .summary-value {
-      color: #fff3b0;
-      font-weight: 800;
-      font-size: 1rem;
-      line-height: 1.2;
-      word-break: break-word;
-    }
-
-    .page {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 16px 14px 28px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .section {
-      background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.012));
-      border: 1px solid rgba(255,255,255,.05);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-    }
-
-    .section-header {
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid var(--line-soft);
-      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
-    }
-
-    .section-title {
-      font-size: 1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .section-sub {
-      margin-top: 6px;
-      font-size: 0.92rem;
-      line-height: 1.45;
-      color: var(--muted);
-    }
-
-    .section-body {
-      padding: 14px;
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .input,
-    .textarea {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,.06);
-      background: #0d0d0d;
-      color: #f2f2f2;
-      border-radius: 14px;
-      padding: 14px 15px;
-      font: inherit;
-      outline: none;
-    }
-
-    .input::placeholder,
-    .textarea::placeholder {
-      color: #777;
-    }
-
-    .textarea {
-      min-height: 120px;
-      resize: vertical;
-      line-height: 1.5;
     }
 
     .controls-list {
@@ -273,30 +239,30 @@
       min-width: 0;
     }
 
-    .control-title {
-      font-size: 0.98rem;
+    .control-name {
+      font-size: .98rem;
       font-weight: 800;
-      letter-spacing: -0.01em;
+      letter-spacing: -.01em;
     }
 
     .control-desc {
       margin-top: 4px;
       color: var(--muted-2);
-      font-size: 0.84rem;
+      font-size: .84rem;
       line-height: 1.35;
     }
 
     .value-badge {
       min-width: 64px;
-      padding: 10px 12px;
       text-align: center;
+      padding: 10px 12px;
       border-radius: 999px;
-      font-weight: 800;
-      font-size: 0.95rem;
       border: 1px solid rgba(255,255,255,.06);
+      font-size: .95rem;
+      font-weight: 800;
+      flex-shrink: 0;
       background: linear-gradient(180deg, #252525, #161616);
       color: #fff;
-      flex-shrink: 0;
     }
 
     .slider-row {
@@ -308,12 +274,14 @@
 
     .slider-edge {
       text-align: center;
-      font-size: 0.78rem;
       color: var(--muted-2);
+      font-size: .78rem;
       font-weight: 700;
     }
 
-    input[type="range"] {
+    .range-input {
+      --fill-percent: 0%;
+      --fill-color: var(--gray-slider);
       appearance: none;
       -webkit-appearance: none;
       width: 100%;
@@ -322,128 +290,102 @@
       margin: 0;
     }
 
-    input[type="range"]:focus {
+    .range-input:focus {
       outline: none;
     }
 
-    input[type="range"]::-webkit-slider-runnable-track {
+    .range-input::-webkit-slider-runnable-track {
       height: 10px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #3a3a3a, #fff2a6);
+      background:
+        linear-gradient(
+          90deg,
+          var(--fill-color) 0%,
+          var(--fill-color) var(--fill-percent),
+          #313131 var(--fill-percent),
+          #313131 100%
+        );
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
     }
 
-    input[type="range"]::-moz-range-track {
+    .range-input::-moz-range-track {
       height: 10px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #3a3a3a, #fff2a6);
+      background:
+        linear-gradient(
+          90deg,
+          var(--fill-color) 0%,
+          var(--fill-color) var(--fill-percent),
+          #313131 var(--fill-percent),
+          #313131 100%
+        );
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
     }
 
-    input[type="range"]::-webkit-slider-thumb {
+    .range-input::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 28px;
       height: 28px;
       border-radius: 50%;
       margin-top: -9px;
-      border: 2px solid #f4e58f;
-      background: radial-gradient(circle at 30% 30%, #fffdf0, #f5db52 72%, #b08a00 100%);
+      border: 2px solid rgba(255,255,255,.18);
+      background: var(--fill-color);
       box-shadow: 0 6px 18px rgba(0,0,0,.35);
     }
 
-    input[type="range"]::-moz-range-thumb {
+    .range-input::-moz-range-thumb {
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      border: 2px solid #f4e58f;
-      background: radial-gradient(circle at 30% 30%, #fffdf0, #f5db52 72%, #b08a00 100%);
+      border: 2px solid rgba(255,255,255,.18);
+      background: var(--fill-color);
       box-shadow: 0 6px 18px rgba(0,0,0,.35);
     }
 
-    .forms-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    .form-toggle {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+    .textarea {
       width: 100%;
-      border: 1px solid rgba(255,255,255,.05);
+      min-height: 140px;
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 14px;
-      background: linear-gradient(180deg, #1a1a1a, #121212);
-      color: #ececec;
-      padding: 14px;
-      min-height: 58px;
-      cursor: pointer;
-      font: inherit;
+      background: #0d0d0d;
+      color: #f1f1f1;
+      padding: 14px 15px;
+      resize: vertical;
+      line-height: 1.5;
+      outline: none;
     }
 
-    .form-toggle.active {
-      background: linear-gradient(180deg, #21b85f, #158747);
-      border-color: rgba(255,255,255,.08);
-      color: #fff;
+    .textarea::placeholder,
+    .input::placeholder {
+      color: #767676;
     }
 
-    .form-name {
-      font-weight: 700;
-      text-align: left;
-    }
-
-    .form-state {
-      font-size: 0.85rem;
-      opacity: 0.92;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .qualities-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .quality-chip {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+    .input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: 14px;
-      background: rgba(255,255,255,.02);
-      border: 1px solid rgba(255,255,255,.04);
-      padding: 12px 14px;
-    }
-
-    .quality-chip-name {
-      color: #ececec;
-      font-size: 0.92rem;
-    }
-
-    .quality-chip-value {
-      font-weight: 800;
-      color: #fff;
+      background: #0d0d0d;
+      color: #f1f1f1;
+      padding: 14px 15px;
+      outline: none;
     }
 
     .actions {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
-      margin-top: 2px;
     }
 
     .btn {
+      flex: 1 1 180px;
+      min-height: 52px;
       border: 0;
       border-radius: 14px;
-      min-height: 52px;
       padding: 14px 16px;
-      font: inherit;
       font-weight: 800;
       cursor: pointer;
       transition: transform .16s ease;
-      flex: 1 1 180px;
     }
 
     .btn:active {
@@ -461,130 +403,313 @@
       border: 1px solid rgba(255,255,255,.06);
     }
 
-    .btn-install {
-      background: linear-gradient(180deg, #2a2a2a, #191919);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.06);
-      display: none;
-    }
-
     .footer-note {
       color: var(--muted-2);
-      font-size: 0.84rem;
+      font-size: .84rem;
       line-height: 1.5;
-      margin-top: 4px;
+      margin-top: 8px;
+    }
+
+    /* Modal + side menu */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .22s ease;
+      z-index: 120;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal,
+    .drawer {
+      position: fixed;
+      z-index: 130;
+      background: linear-gradient(180deg, #111111, #0b0b0b);
+      border: 1px solid rgba(255,255,255,.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    }
+
+    .modal {
+      left: 50%;
+      top: 50%;
+      width: min(92vw, 420px);
+      border-radius: 22px;
+      transform: translate(-50%, -46%) scale(.98);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .22s ease, opacity .22s ease;
+      overflow: hidden;
+    }
+
+    .modal.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .drawer {
+      top: 0;
+      right: 0;
+      width: min(92vw, 420px);
+      height: 100dvh;
+      transform: translateX(100%);
+      transition: transform .22s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .modal-header,
+    .drawer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .modal-title,
+    .drawer-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, #222, #151515);
+      color: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .modal-body,
+    .drawer-body {
+      padding: 16px;
+    }
+
+    .modal-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      min-height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: linear-gradient(180deg, #1d1d1d, #131313);
+      color: #ececec;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(180deg, #fff1a8, #d3ad12);
+      color: #0a0a0a;
+    }
+
+    .tab-panel {
+      display: none;
+      min-height: 0;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .forms-list,
+    .history-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .form-row,
+    .history-row {
+      background: linear-gradient(180deg, #151515, #101010);
+      border: 1px solid rgba(255,255,255,.045);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .form-title {
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .switch {
+      position: relative;
+      width: 54px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .switch-track {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: #4b4b4b;
+      border: 1px solid rgba(255,255,255,.08);
+      transition: background .2s ease;
+      position: relative;
+    }
+
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #d6d6d6;
+      transition: transform .2s ease, background .2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,.3);
+    }
+
+    .switch input:checked + .switch-track {
+      background: #d8b922;
+    }
+
+    .switch input:checked + .switch-track::after {
+      transform: translateX(24px);
+      background: #fff4b3;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .history-name {
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .history-date {
+      color: var(--muted-2);
+      font-size: .82rem;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .history-detail {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    .blank-panel {
+      min-height: 260px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #111, #0b0b0b);
+      border: 1px dashed rgba(255,255,255,.05);
     }
 
     @media (max-width: 760px) {
-      .top-title-row {
-        flex-direction: column;
+      .topbar {
         align-items: stretch;
       }
 
-      .save-pill {
-        width: 100%;
+      .topbar-right {
+        justify-content: flex-end;
       }
 
-      .summary-row,
-      .meta-grid,
-      .qualities-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .radar-canvas-wrap {
-        max-width: 220px;
-        height: 220px;
+      .radar-box {
+        max-width: 290px;
+        height: 290px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app">
+    <div class="container">
 
-    <header class="radar-top">
-      <div class="radar-top-inner">
-        <div class="top-title-row">
-          <div class="brand-block">
-            <div class="eyebrow">Profil martial</div>
-            <h1>Gōng</h1>
-          </div>
-          <div id="saveStatus" class="save-pill">Sauvegarde automatique active</div>
+      <div class="topbar">
+        <div class="brand">
+          <div class="eyebrow">Profil martial</div>
+          <h1 class="title">Gōng</h1>
         </div>
 
-        <div class="radar-card">
-          <div class="radar-canvas-wrap">
-            <canvas id="radarCanvas" width="700" height="700"></canvas>
-          </div>
-
-          <div class="summary-row">
-            <div class="summary-box">
-              <div class="summary-label">Moyenne</div>
-              <div class="summary-value" id="averageValue">0.0 / 10</div>
-            </div>
-            <div class="summary-box">
-              <div class="summary-label">Point fort</div>
-              <div class="summary-value" id="bestValue">—</div>
-            </div>
-            <div class="summary-box">
-              <div class="summary-label">À travailler</div>
-              <div class="summary-value" id="lowestValue">—</div>
-            </div>
-          </div>
+        <div class="topbar-right">
+          <button id="loginBtn" class="top-btn" type="button">Se connecter</button>
+          <button id="userBtn" class="user-pill" type="button"></button>
+          <button id="menuBtn" class="menu-btn" type="button" aria-label="Ouvrir le menu">☰</button>
         </div>
       </div>
-    </header>
 
-    <main class="page">
+      <div id="saveStatus" class="save-pill">Sauvegarde automatique active</div>
 
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Informations</div>
-          <div class="section-sub">Ces données sont enregistrées automatiquement sur l’appareil.</div>
-        </div>
-        <div class="section-body">
-          <div class="meta-grid">
-            <input id="studentName" class="input" type="text" placeholder="Nom de l'élève" />
-            <input id="sessionDate" class="input" type="date" />
+      <section class="card">
+        <div class="radar-shell">
+          <div class="radar-box">
+            <canvas id="radarCanvas" width="700" height="700"></canvas>
           </div>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Évaluation des qualités</div>
-          <div class="section-sub">Chaque valeur démarre à 0. Plus la note monte, plus la couleur tire vers le jaune.</div>
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Évaluation des qualités</div>
+          <div class="card-sub">Chaque valeur démarre à 0. Le niveau 0 reste gris, puis les nuances passent au jaune à partir de 1.</div>
         </div>
-        <div class="section-body">
+        <div class="card-body">
           <div id="controlsList" class="controls-list"></div>
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Formes</div>
-          <div class="section-sub">Validation simple : gris = non validé, vert = validé.</div>
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Observations</div>
+          <div class="card-sub">Notes libres, remarques techniques, axes de progression.</div>
         </div>
-        <div class="section-body">
-          <div id="formsGrid" class="forms-grid"></div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Résumé des valeurs</div>
-          <div class="section-sub">Vue rapide de toutes les qualités notées.</div>
-        </div>
-        <div class="section-body">
-          <div id="qualitiesGrid" class="qualities-grid"></div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Observation</div>
-          <div class="section-sub">Notes libres, remarques techniques, axes de progression.</div>
-        </div>
-        <div class="section-body">
+        <div class="card-body">
           <textarea
             id="coachNote"
             class="textarea"
@@ -593,78 +718,93 @@
         </div>
       </section>
 
-      <section class="section">
-        <div class="section-header">
-          <div class="section-title">Actions</div>
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">Actions</div>
         </div>
-        <div class="section-body">
+        <div class="card-body">
           <div class="actions">
-            <button id="installBtn" class="btn btn-install">Installer l’application</button>
-            <button id="randomBtn" class="btn btn-secondary">Exemple auto</button>
-            <button id="resetBtn" class="btn btn-primary">Réinitialiser</button>
+            <button id="resetBtn" class="btn btn-primary" type="button">Réinitialiser</button>
           </div>
           <div class="footer-note">
-            Pour l’installation PWA, ouvre cette app depuis un site en HTTPS ou via GitHub Pages, Netlify ou Vercel.
+            L’historique détaillé est disponible dans le menu en haut à droite.
           </div>
         </div>
       </section>
 
-    </main>
+    </div>
   </div>
+
+  <div id="overlay" class="overlay"></div>
+
+  <div id="loginModal" class="modal" aria-hidden="true">
+    <div class="modal-header">
+      <div class="modal-title">Se connecter</div>
+      <button id="closeLoginBtn" class="close-btn" type="button">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-grid">
+        <input id="studentNameInput" class="input" type="text" placeholder="Nom" />
+        <input id="sessionDateInput" class="input" type="date" />
+      </div>
+      <div class="modal-actions">
+        <button id="saveProfileBtn" class="btn btn-primary" type="button">Valider</button>
+        <button id="cancelProfileBtn" class="btn btn-secondary" type="button">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <aside id="menuDrawer" class="drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title">Menu</div>
+      <button id="closeMenuBtn" class="close-btn" type="button">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="tabs">
+        <button class="tab-btn active" type="button" data-tab="formes">Formes</button>
+        <button class="tab-btn" type="button" data-tab="historique">Historique</button>
+        <button class="tab-btn" type="button" data-tab="notation">Notation</button>
+      </div>
+
+      <div id="tab-formes" class="tab-panel active">
+        <div id="formsList" class="forms-list"></div>
+      </div>
+
+      <div id="tab-historique" class="tab-panel">
+        <div id="historyList" class="history-list"></div>
+      </div>
+
+      <div id="tab-notation" class="tab-panel">
+        <div class="blank-panel"></div>
+      </div>
+    </div>
+  </aside>
 
   <script>
     const martialQualities = [
-      {
-        key: "relachement",
-        label: "Relâchement",
-        description: "Capacité à supprimer les tensions inutiles."
-      },
-      {
-        key: "precision",
-        label: "Précision",
-        description: "Justesse des gestes, trajectoires et placements."
-      },
-      {
-        key: "structure",
-        label: "Structure",
-        description: "Organisation corporelle et alignement."
-      },
-      {
-        key: "ancrage",
-        label: "Ancrage",
-        description: "Connexion au sol et stabilité."
-      },
-      {
-        key: "vitesse",
-        label: "Vitesse",
-        description: "Rapidité d’exécution et de réaction."
-      },
-      {
-        key: "coordination",
-        label: "Coordination",
-        description: "Capacité à synchroniser le corps efficacement."
-      },
-      {
-        key: "endurance",
-        label: "Endurance",
-        description: "Capacité à maintenir l’effort dans la durée."
-      }
+      { key: "relachement", label: "Relâchement", shortLabel: "Relâch.", description: "Capacité à supprimer les tensions inutiles." },
+      { key: "precision", label: "Précision", shortLabel: "Précision", description: "Justesse des gestes, trajectoires et placements." },
+      { key: "structure", label: "Structure", shortLabel: "Structure", description: "Organisation corporelle et alignement." },
+      { key: "ancrage", label: "Ancrage", shortLabel: "Ancrage", description: "Connexion au sol et stabilité." },
+      { key: "vitesse", label: "Vitesse", shortLabel: "Vitesse", description: "Rapidité d’exécution et de réaction." },
+      { key: "coordination", label: "Coordination", shortLabel: "Coord.", description: "Capacité à synchroniser le corps efficacement." },
+      { key: "endurance", label: "Endurance", shortLabel: "Endurance", description: "Capacité à maintenir l’effort dans la durée." }
     ];
 
     const martialForms = [
-      { key: "forme1", label: "Forme 1" },
-      { key: "forme2", label: "Forme 2" },
-      { key: "forme3", label: "Forme 3" },
-      { key: "forme4", label: "Forme 4" },
-      { key: "mannequin", label: "Mannequin" },
-      { key: "couteaux", label: "Couteaux papillon" },
-      { key: "baton", label: "Bâton long" }
+      { key: "forme1", label: "Shil Lim Tao" },
+      { key: "forme2", label: "Chum Kil" },
+      { key: "forme3", label: "Bil Jee" },
+      { key: "forme4", label: "Shil Lim Tao avancée" },
+      { key: "mannequin", label: "Mannequin de bois - 108 Mouvements" },
+      { key: "couteaux", label: "Arme - Couteaux papillon" },
+      { key: "baton", label: "Arme - Bâton long" }
     ];
 
-    const storageKey = "gong-martial-app-v3";
+    const storageKey = "gong-martial-app-v5";
 
     const defaultState = {
-      studentName: "",
+      userName: "",
       sessionDate: "",
       coachNote: "",
       values: martialQualities.reduce((acc, item) => {
@@ -674,33 +814,45 @@
       forms: martialForms.reduce((acc, item) => {
         acc[item.key] = false;
         return acc;
-      }, {})
+      }, {}),
+      history: []
     };
 
-    let deferredPrompt = null;
     let saveTimer = null;
 
     const saveStatus = document.getElementById("saveStatus");
-    const studentNameInput = document.getElementById("studentName");
-    const sessionDateInput = document.getElementById("sessionDate");
-    const coachNoteInput = document.getElementById("coachNote");
+    const loginBtn = document.getElementById("loginBtn");
+    const userBtn = document.getElementById("userBtn");
+    const menuBtn = document.getElementById("menuBtn");
+    const overlay = document.getElementById("overlay");
+    const loginModal = document.getElementById("loginModal");
+    const menuDrawer = document.getElementById("menuDrawer");
+    const closeLoginBtn = document.getElementById("closeLoginBtn");
+    const closeMenuBtn = document.getElementById("closeMenuBtn");
+    const saveProfileBtn = document.getElementById("saveProfileBtn");
+    const cancelProfileBtn = document.getElementById("cancelProfileBtn");
+    const studentNameInput = document.getElementById("studentNameInput");
+    const sessionDateInput = document.getElementById("sessionDateInput");
     const controlsList = document.getElementById("controlsList");
-    const formsGrid = document.getElementById("formsGrid");
-    const qualitiesGrid = document.getElementById("qualitiesGrid");
-    const averageValue = document.getElementById("averageValue");
-    const bestValue = document.getElementById("bestValue");
-    const lowestValue = document.getElementById("lowestValue");
-    const installBtn = document.getElementById("installBtn");
-    const randomBtn = document.getElementById("randomBtn");
+    const formsList = document.getElementById("formsList");
+    const historyList = document.getElementById("historyList");
+    const coachNoteInput = document.getElementById("coachNote");
     const resetBtn = document.getElementById("resetBtn");
     const canvas = document.getElementById("radarCanvas");
     const ctx = canvas.getContext("2d");
 
+    const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+    const tabPanels = {
+      formes: document.getElementById("tab-formes"),
+      historique: document.getElementById("tab-historique"),
+      notation: document.getElementById("tab-notation")
+    };
+
     let state = loadState();
 
-    studentNameInput.value = state.studentName;
-    sessionDateInput.value = state.sessionDate;
     coachNoteInput.value = state.coachNote;
+    studentNameInput.value = state.userName;
+    sessionDateInput.value = state.sessionDate || getTodayDateInputValue();
 
     function cloneDefaultState() {
       return JSON.parse(JSON.stringify(defaultState));
@@ -712,21 +864,17 @@
         if (!raw) return cloneDefaultState();
 
         const parsed = JSON.parse(raw);
-
         return {
-          studentName: parsed.studentName ?? defaultState.studentName,
+          userName: parsed.userName ?? defaultState.userName,
           sessionDate: parsed.sessionDate ?? defaultState.sessionDate,
           coachNote: parsed.coachNote ?? defaultState.coachNote,
           values: { ...defaultState.values, ...(parsed.values || {}) },
-          forms: { ...defaultState.forms, ...(parsed.forms || {}) }
+          forms: { ...defaultState.forms, ...(parsed.forms || {}) },
+          history: Array.isArray(parsed.history) ? parsed.history : []
         };
       } catch {
         return cloneDefaultState();
       }
-    }
-
-    function setSaveStatus(text) {
-      saveStatus.textContent = text;
     }
 
     function saveState() {
@@ -741,7 +889,11 @@
     function scheduleSave() {
       setSaveStatus("Sauvegarde en cours...");
       clearTimeout(saveTimer);
-      saveTimer = setTimeout(saveState, 160);
+      saveTimer = setTimeout(saveState, 140);
+    }
+
+    function setSaveStatus(text) {
+      saveStatus.textContent = text;
     }
 
     function clamp(value, min, max) {
@@ -750,8 +902,7 @@
 
     function getYellowShade(value) {
       const v = clamp(Number(value), 0, 10);
-
-      if (v === 0) return "#6f6f6f";
+      if (v === 0) return "#5f5f5f";
 
       const shades = [
         "#7a744d",
@@ -769,11 +920,144 @@
       return shades[v - 1];
     }
 
+    function getTodayDateInputValue() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatPreciseDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleString("fr-FR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+    }
+
+    function addHistoryEntry(type, title, detail) {
+      state.history.unshift({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        type,
+        title,
+        detail,
+        createdAt: new Date().toISOString()
+      });
+
+      if (state.history.length > 300) {
+        state.history = state.history.slice(0, 300);
+      }
+
+      renderHistory();
+      scheduleSave();
+    }
+
+    function updateHeaderIdentity() {
+      const name = state.userName.trim();
+
+      if (name) {
+        userBtn.textContent = name;
+        userBtn.style.display = "inline-flex";
+        loginBtn.style.display = "none";
+      } else {
+        userBtn.style.display = "none";
+        loginBtn.style.display = "inline-flex";
+      }
+    }
+
+    function openOverlay() {
+      overlay.classList.add("open");
+    }
+
+    function closeOverlayIfNoneOpen() {
+      if (!loginModal.classList.contains("open") && !menuDrawer.classList.contains("open")) {
+        overlay.classList.remove("open");
+      }
+    }
+
+    function openLoginModal() {
+      studentNameInput.value = state.userName;
+      sessionDateInput.value = state.sessionDate || getTodayDateInputValue();
+      loginModal.classList.add("open");
+      openOverlay();
+    }
+
+    function closeLoginModal() {
+      loginModal.classList.remove("open");
+      closeOverlayIfNoneOpen();
+    }
+
+    function openMenu() {
+      menuDrawer.classList.add("open");
+      openOverlay();
+    }
+
+    function closeMenu() {
+      menuDrawer.classList.remove("open");
+      closeOverlayIfNoneOpen();
+    }
+
+    function activateTab(tabName) {
+      tabButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tab === tabName);
+      });
+
+      Object.entries(tabPanels).forEach(([name, panel]) => {
+        panel.classList.toggle("active", name === tabName);
+      });
+    }
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activateTab(btn.dataset.tab);
+      });
+    });
+
+    loginBtn.addEventListener("click", openLoginModal);
+    userBtn.addEventListener("click", openLoginModal);
+    menuBtn.addEventListener("click", openMenu);
+    closeLoginBtn.addEventListener("click", closeLoginModal);
+    cancelProfileBtn.addEventListener("click", closeLoginModal);
+    closeMenuBtn.addEventListener("click", closeMenu);
+    overlay.addEventListener("click", () => {
+      closeLoginModal();
+      closeMenu();
+    });
+
+    saveProfileBtn.addEventListener("click", () => {
+      const oldName = state.userName;
+      const oldDate = state.sessionDate;
+
+      state.userName = studentNameInput.value.trim();
+      state.sessionDate = sessionDateInput.value;
+
+      updateHeaderIdentity();
+
+      if (state.userName !== oldName || state.sessionDate !== oldDate) {
+        addHistoryEntry(
+          "profil",
+          "Profil mis à jour",
+          `${state.userName || "Sans nom"}${state.sessionDate ? " — séance du " + state.sessionDate : ""}`
+        );
+      } else {
+        scheduleSave();
+      }
+
+      closeLoginModal();
+    });
+
     function createControls() {
       controlsList.innerHTML = "";
 
       martialQualities.forEach((quality) => {
-        const value = state.values[quality.key];
+        const value = Number(state.values[quality.key] || 0);
+        const percent = `${value * 10}%`;
+        const fillColor = getYellowShade(value);
 
         const card = document.createElement("div");
         card.className = "control-card";
@@ -781,18 +1065,20 @@
         card.innerHTML = `
           <div class="control-head">
             <div class="control-text">
-              <div class="control-title">${quality.label}</div>
+              <div class="control-name">${quality.label}</div>
               <div class="control-desc">${quality.description}</div>
             </div>
             <div
               class="value-badge"
               id="badge-${quality.key}"
-              style="color:${value > 0 ? '#111' : '#fff'}; background:${getYellowShade(value)};"
+              style="background:${fillColor}; color:${value > 0 ? "#111" : "#fff"};"
             >${value}/10</div>
           </div>
           <div class="slider-row">
             <div class="slider-edge">0</div>
             <input
+              class="range-input"
+              id="range-${quality.key}"
               type="range"
               min="0"
               max="10"
@@ -800,6 +1086,7 @@
               value="${value}"
               data-key="${quality.key}"
               aria-label="${quality.label}"
+              style="--fill-percent:${percent}; --fill-color:${fillColor};"
             />
             <div class="slider-edge">10</div>
           </div>
@@ -808,7 +1095,7 @@
         controlsList.appendChild(card);
       });
 
-      controlsList.querySelectorAll('input[type="range"]').forEach((slider) => {
+      controlsList.querySelectorAll(".range-input").forEach((slider) => {
         slider.addEventListener("input", (event) => {
           const key = event.target.dataset.key;
           const value = Number(event.target.value);
@@ -816,104 +1103,104 @@
           state.values[key] = value;
 
           const badge = document.getElementById(`badge-${key}`);
+          const fillColor = getYellowShade(value);
+
           badge.textContent = `${value}/10`;
-          badge.style.background = getYellowShade(value);
+          badge.style.background = fillColor;
           badge.style.color = value > 0 ? "#111" : "#fff";
 
-          renderAll();
+          event.target.style.setProperty("--fill-percent", `${value * 10}%`);
+          event.target.style.setProperty("--fill-color", fillColor);
+
+          drawRadar();
           scheduleSave();
         }, { passive: true });
+
+        slider.addEventListener("change", (event) => {
+          const key = event.target.dataset.key;
+          const value = Number(event.target.value);
+          const quality = martialQualities.find((item) => item.key === key);
+
+          addHistoryEntry(
+            "curseur",
+            `${quality.label} modifié`,
+            `Nouvelle valeur : ${value}/10`
+          );
+        });
       });
     }
 
-    function createForms() {
-      formsGrid.innerHTML = "";
+    function renderForms() {
+      formsList.innerHTML = "";
 
       martialForms.forEach((form) => {
-        const isActive = !!state.forms[form.key];
+        const checked = !!state.forms[form.key];
 
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = `form-toggle${isActive ? " active" : ""}`;
-        btn.innerHTML = `
-          <span class="form-name">${form.label}</span>
-          <span class="form-state">${isActive ? "Validé" : "Non validé"}</span>
+        const row = document.createElement("div");
+        row.className = "form-row";
+
+        row.innerHTML = `
+          <div class="form-title">${form.label}</div>
+          <label class="switch" aria-label="${form.label}">
+            <input type="checkbox" data-form-key="${form.key}" ${checked ? "checked" : ""} />
+            <span class="switch-track"></span>
+          </label>
         `;
 
-        btn.addEventListener("click", () => {
-          state.forms[form.key] = !state.forms[form.key];
-          createForms();
-          scheduleSave();
-        });
+        formsList.appendChild(row);
+      });
 
-        formsGrid.appendChild(btn);
+      formsList.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+        input.addEventListener("change", (event) => {
+          const key = event.target.dataset.formKey;
+          const form = martialForms.find((item) => item.key === key);
+          state.forms[key] = event.target.checked;
+
+          addHistoryEntry(
+            "forme",
+            `${form.label}`,
+            event.target.checked ? "Validé" : "Non validé"
+          );
+        });
       });
     }
 
-    function renderQualitiesGrid() {
-      qualitiesGrid.innerHTML = martialQualities.map((quality) => {
-        const value = state.values[quality.key];
-        return `
-          <div class="quality-chip">
-            <span class="quality-chip-name">${quality.label}</span>
-            <span class="quality-chip-value" style="color:${getYellowShade(value)}">${value}/10</span>
-          </div>
+    function renderHistory() {
+      historyList.innerHTML = "";
+
+      if (!state.history.length) {
+        const row = document.createElement("div");
+        row.className = "history-row";
+        row.innerHTML = `
+          <div class="history-detail">Aucune modification enregistrée pour le moment.</div>
         `;
-      }).join("");
-    }
+        historyList.appendChild(row);
+        return;
+      }
 
-    function renderSummary() {
-      const entries = martialQualities.map((item) => ({
-        ...item,
-        value: Number(state.values[item.key] || 0)
-      }));
-
-      const total = entries.reduce((sum, item) => sum + item.value, 0);
-      const avg = total / entries.length;
-      const sortedHigh = [...entries].sort((a, b) => b.value - a.value);
-      const sortedLow = [...entries].sort((a, b) => a.value - b.value);
-
-      averageValue.textContent = `${avg.toFixed(1)} / 10`;
-      bestValue.textContent = `${sortedHigh[0].label} (${sortedHigh[0].value})`;
-      lowestValue.textContent = `${sortedLow[0].label} (${sortedLow[0].value})`;
+      state.history.forEach((entry) => {
+        const row = document.createElement("div");
+        row.className = "history-row";
+        row.innerHTML = `
+          <div class="history-top">
+            <div class="history-name">${entry.title}</div>
+            <div class="history-date">${formatPreciseDate(entry.createdAt)}</div>
+          </div>
+          <div class="history-detail">${entry.detail}</div>
+        `;
+        historyList.appendChild(row);
+      });
     }
 
     function resizeCanvasForDisplay() {
       const ratio = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
-      const size = Math.max(220, Math.floor(Math.min(rect.width, rect.height || rect.width)));
+      const size = Math.max(280, Math.floor(Math.min(rect.width, rect.height || rect.width)));
       canvas.width = Math.floor(size * ratio);
       canvas.height = Math.floor(size * ratio);
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(ratio, ratio);
       return size;
-    }
-
-    function drawWrappedLabel(text, x, y, maxWidth, lineHeight) {
-      const words = text.split(" ");
-      const lines = [];
-      let currentLine = "";
-
-      for (const word of words) {
-        const testLine = currentLine ? `${currentLine} ${word}` : word;
-        const testWidth = ctx.measureText(testLine).width;
-
-        if (testWidth > maxWidth && currentLine) {
-          lines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      }
-
-      if (currentLine) lines.push(currentLine);
-
-      const totalHeight = (lines.length - 1) * lineHeight;
-      const startY = y - totalHeight / 2;
-
-      lines.forEach((line, index) => {
-        ctx.fillText(line, x, startY + index * lineHeight);
-      });
     }
 
     function drawRadar() {
@@ -922,11 +1209,8 @@
       const height = size;
       const centerX = width / 2;
       const centerY = height / 2;
-
-      /* CHANGEMENT VISIBLE : rayon plus petit pour laisser la place aux mots */
       const outerPadding = 64;
       const radius = Math.min(width, height) / 2 - outerPadding;
-
       const levels = 10;
       const angleStep = (Math.PI * 2) / martialQualities.length;
 
@@ -940,14 +1224,11 @@
           const angle = -Math.PI / 2 + i * angleStep;
           const x = centerX + Math.cos(angle) * currentRadius;
           const y = centerY + Math.sin(angle) * currentRadius;
-
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
         ctx.closePath();
-        ctx.strokeStyle = level === levels
-          ? "rgba(255,255,255,.16)"
-          : "rgba(255,255,255,.08)";
+        ctx.strokeStyle = level === levels ? "rgba(255,255,255,.16)" : "rgba(255,255,255,.08)";
         ctx.lineWidth = 1;
         ctx.stroke();
       }
@@ -972,7 +1253,6 @@
         const pointRadius = radius * normalized;
 
         return {
-          label: quality.label,
           value,
           angle,
           x: centerX + Math.cos(angle) * pointRadius,
@@ -987,135 +1267,87 @@
       });
       ctx.closePath();
 
-      const gradient = ctx.createRadialGradient(
-        centerX,
-        centerY,
-        radius * 0.08,
-        centerX,
-        centerY,
-        radius
-      );
-      gradient.addColorStop(0, "rgba(255, 229, 102, .42)");
-      gradient.addColorStop(.55, "rgba(255, 214, 61, .26)");
-      gradient.addColorStop(1, "rgba(255, 190, 0, .08)");
+      const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.08, centerX, centerY, radius);
+      gradient.addColorStop(0, "rgba(255,229,102,.42)");
+      gradient.addColorStop(.55, "rgba(255,214,61,.26)");
+      gradient.addColorStop(1, "rgba(255,190,0,.08)");
 
       ctx.fillStyle = gradient;
-      ctx.strokeStyle = "rgba(255, 225, 80, .95)";
+      ctx.strokeStyle = "rgba(255,225,80,.95)";
       ctx.lineWidth = 2.2;
       ctx.fill();
       ctx.stroke();
 
       points.forEach((point) => {
         ctx.beginPath();
-        ctx.arc(point.x, point.y, 4.4, 0, Math.PI * 2);
+        ctx.arc(point.x, point.y, 4.6, 0, Math.PI * 2);
         ctx.fillStyle = getYellowShade(point.value);
         ctx.fill();
       });
 
-      const fontSize = Math.max(9, Math.min(11, width * 0.042));
-      const lineHeight = fontSize + 2;
-
+      const fontSize = Math.max(10, Math.min(12, width * 0.04));
       ctx.font = `${fontSize}px Inter, Arial, sans-serif`;
       ctx.fillStyle = "rgba(240,240,240,.92)";
       ctx.textBaseline = "middle";
 
       martialQualities.forEach((quality, index) => {
         const angle = -Math.PI / 2 + index * angleStep;
-        const labelRadius = radius + 22;
+        const labelRadius = radius + 26;
         const lx = centerX + Math.cos(angle) * labelRadius;
         const ly = centerY + Math.sin(angle) * labelRadius;
+        const label = quality.shortLabel;
 
         if (lx < centerX - 16) ctx.textAlign = "right";
         else if (lx > centerX + 16) ctx.textAlign = "left";
         else ctx.textAlign = "center";
 
-        drawWrappedLabel(quality.label, lx, ly, 58, lineHeight);
+        ctx.fillText(label, lx, ly);
       });
 
       ctx.beginPath();
       ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
-      ctx.fillStyle = "#fff3b0";
+      ctx.fillStyle = "#fff4b3";
       ctx.fill();
     }
 
     function renderAll() {
-      renderSummary();
-      renderQualitiesGrid();
+      updateHeaderIdentity();
+      createControls();
+      renderForms();
+      renderHistory();
       drawRadar();
     }
 
-    function syncMetaState() {
-      state.studentName = studentNameInput.value;
-      state.sessionDate = sessionDateInput.value;
+    function syncObservation() {
       state.coachNote = coachNoteInput.value;
       scheduleSave();
     }
 
-    studentNameInput.addEventListener("input", syncMetaState, { passive: true });
-    sessionDateInput.addEventListener("input", syncMetaState, { passive: true });
-    coachNoteInput.addEventListener("input", syncMetaState, { passive: true });
-
-    randomBtn.addEventListener("click", () => {
-      martialQualities.forEach((quality) => {
-        state.values[quality.key] = Math.floor(Math.random() * 11);
-      });
-
-      martialForms.forEach((form) => {
-        state.forms[form.key] = Math.random() > 0.5;
-      });
-
-      createControls();
-      createForms();
-      renderAll();
-      scheduleSave();
-    });
+    coachNoteInput.addEventListener("input", syncObservation, { passive: true });
 
     resetBtn.addEventListener("click", () => {
+      const existingUserName = state.userName;
+      const existingSessionDate = state.sessionDate;
+
       state = cloneDefaultState();
+      state.userName = existingUserName;
+      state.sessionDate = existingSessionDate;
 
-      studentNameInput.value = "";
-      sessionDateInput.value = "";
       coachNoteInput.value = "";
+      studentNameInput.value = state.userName;
+      sessionDateInput.value = state.sessionDate || getTodayDateInputValue();
 
-      createControls();
-      createForms();
+      addHistoryEntry(
+        "reset",
+        "Évaluation réinitialisée",
+        "Tous les curseurs ont été remis à 0 et les validations des formes ont été réinitialisées."
+      );
+
       renderAll();
-      scheduleSave();
     });
 
     window.addEventListener("resize", drawRadar, { passive: true });
 
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", async () => {
-        try {
-          await navigator.serviceWorker.register("./service-worker.js");
-        } catch (error) {
-          console.error("Erreur Service Worker :", error);
-        }
-      });
-    }
-
-    window.addEventListener("beforeinstallprompt", (event) => {
-      event.preventDefault();
-      deferredPrompt = event;
-      installBtn.style.display = "block";
-    });
-
-    installBtn.addEventListener("click", async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.style.display = "none";
-    });
-
-    window.addEventListener("appinstalled", () => {
-      installBtn.style.display = "none";
-      setSaveStatus("Application installée");
-    });
-
-    createControls();
-    createForms();
     renderAll();
     saveState();
   </script>
