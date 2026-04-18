@@ -1,4 +1,4 @@
-const CACHE_NAME = "gong-cache-v6";
+const CACHE_NAME = "gong-cache-v7";
 
 const ASSETS_TO_CACHE = [
   "./",
