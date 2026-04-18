@@ -744,12 +744,19 @@
     </div>
     <div class="modal-body">
       <div class="modal-grid">
-        <input id="studentNameInput" class="input" type="text" placeholder="Nom" />
+        <input id="studentNameInput" class="input" type="text" placeholder="Pseudo" autocomplete="username" />
+        <input id="passwordInput" class="input" type="password" placeholder="Mot de passe" autocomplete="current-password" />
         <input id="sessionDateInput" class="input" type="date" />
+        <textarea id="transferCodeInput" class="textarea" placeholder="Code de transfert (optionnel)" style="min-height:90px;"></textarea>
       </div>
       <div class="modal-actions">
+        <button id="saveProfileBtn" class="btn btn-primary" type="button">Connexion</button>
         <button id="saveProfileBtn" class="btn btn-primary" type="button">Valider</button>
         <button id="cancelProfileBtn" class="btn btn-secondary" type="button">Annuler</button>
+      </div>
+       <div class="modal-actions">
+        <button id="importCodeBtn" class="btn btn-secondary" type="button">Importer un code</button>
+        <button id="exportCodeBtn" class="btn btn-secondary" type="button">Exporter mon code</button>
       </div>
     </div>
   </div>
@@ -802,6 +809,7 @@
     ];
 
     const storageKey = "gong-martial-app-v5";
+    const authStorageKey = "gong-auth-v1";
 
     const defaultState = {
       userName: "",
@@ -833,6 +841,10 @@
     const cancelProfileBtn = document.getElementById("cancelProfileBtn");
     const studentNameInput = document.getElementById("studentNameInput");
     const sessionDateInput = document.getElementById("sessionDateInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const transferCodeInput = document.getElementById("transferCodeInput");
+    const importCodeBtn = document.getElementById("importCodeBtn");
+    const exportCodeBtn = document.getElementById("exportCodeBtn");
     const controlsList = document.getElementById("controlsList");
     const formsList = document.getElementById("formsList");
     const historyList = document.getElementById("historyList");
@@ -849,10 +861,20 @@
     };
 
     let state = loadState();
+    let auth = loadAuth();
 
     coachNoteInput.value = state.coachNote;
     studentNameInput.value = state.userName;
     sessionDateInput.value = state.sessionDate || getTodayDateInputValue();
+
+    updateLoginCta();
+
+    function cloneDefaultAuth() {
+      return {
+        username: "",
+        passwordHash: ""
+      };
+    }
 
     function cloneDefaultState() {
       return JSON.parse(JSON.stringify(defaultState));
@@ -885,6 +907,45 @@
         setSaveStatus("Erreur de sauvegarde");
       }
     }
+    
+    function loadAuth() {
+      try {
+        const raw = localStorage.getItem(authStorageKey);
+        if (!raw) return cloneDefaultAuth();
+        const parsed = JSON.parse(raw);
+        return {
+          username: String(parsed.username || ""),
+          passwordHash: String(parsed.passwordHash || "")
+        };
+      } catch {
+        return cloneDefaultAuth();
+      }
+    }
+
+    function saveAuth() {
+      localStorage.setItem(authStorageKey, JSON.stringify(auth));
+    }
+
+    async function sha256Hex(text) {
+      const bytes = new TextEncoder().encode(text);
+      const digest = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function updateLoginCta() {
+      saveProfileBtn.textContent = auth.username ? "Connexion" : "Créer le compte";
+    }
+
+    function encodeTransferCode(payload) {
+      return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    }
+
+    function decodeTransferCode(code) {
+      return JSON.parse(decodeURIComponent(escape(atob(code.trim()))));
+    }
+
 
     function scheduleSave() {
       setSaveStatus("Sauvegarde en cours...");
@@ -983,6 +1044,7 @@
     function openLoginModal() {
       studentNameInput.value = state.userName;
       sessionDateInput.value = state.sessionDate || getTodayDateInputValue();
+      passwordInput.value = "";
       loginModal.classList.add("open");
       openOverlay();
     }
@@ -1029,11 +1091,34 @@
       closeMenu();
     });
 
-    saveProfileBtn.addEventListener("click", () => {
+    saveProfileBtn.addEventListener("click", async () => {
       const oldName = state.userName;
       const oldDate = state.sessionDate;
+      const pseudo = studentNameInput.value.trim();
+      const password = passwordInput.value;
 
-      state.userName = studentNameInput.value.trim();
+      if (!pseudo || !password) {
+        alert("Merci de saisir un pseudo et un mot de passe.");
+        return;
+      }
+
+      const passwordHash = await sha256Hex(password);
+
+      if (!auth.username) {
+        auth = {
+          username: pseudo,
+          passwordHash
+        };
+        saveAuth();
+        updateLoginCta();
+      } else {
+        if (pseudo !== auth.username || passwordHash !== auth.passwordHash) {
+          alert("Pseudo ou mot de passe invalide.");
+          return;
+        }
+      }
+
+      state.userName = pseudo;
       state.sessionDate = sessionDateInput.value;
 
       updateHeaderIdentity();
@@ -1049,6 +1134,60 @@
       }
 
       closeLoginModal();
+    });
+
+    importCodeBtn.addEventListener("click", () => {
+      const code = transferCodeInput.value.trim();
+      if (!code) {
+        alert("Colle d'abord un code de transfert.");
+        return;
+      }
+
+      try {
+        const payload = decodeTransferCode(code);
+        if (!payload?.username || !payload?.passwordHash) {
+          throw new Error("invalid payload");
+        }
+        auth = {
+          username: String(payload.username),
+          passwordHash: String(payload.passwordHash)
+        };
+        saveAuth();
+        updateLoginCta();
+        studentNameInput.value = auth.username;
+        alert("Compte importé. Entre ton mot de passe pour te connecter.");
+      } catch {
+        alert("Code invalide.");
+      }
+    });
+
+    exportCodeBtn.addEventListener("click", async () => {
+      const pseudo = studentNameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!auth.username) {
+        alert("Crée d'abord un compte sur ce terminal.");
+        return;
+      }
+
+      if (pseudo !== auth.username || !password) {
+        alert("Renseigne ton pseudo et ton mot de passe pour exporter.");
+        return;
+      }
+
+      const passwordHash = await sha256Hex(password);
+      if (passwordHash !== auth.passwordHash) {
+        alert("Mot de passe invalide.");
+        return;
+      }
+
+      transferCodeInput.value = encodeTransferCode({
+        username: auth.username,
+        passwordHash: auth.passwordHash,
+        version: 1
+      });
+      transferCodeInput.select();
+      alert("Code généré. Copie-le et colle-le sur l'autre terminal.");
     });
 
     function createControls() {
